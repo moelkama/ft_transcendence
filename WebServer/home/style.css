@@ -1,0 +1,54 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: gray; /* Set background color */
+}
+
+.navbar {
+    background-color: #333; /* Navbar background color */
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar h1 {
+    margin: 0;
+    font-size: 20px; /* Increase font size */
+}
+
+#pro {
+    border: 2px solid white; /* Add border around user image */
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+canvas {
+    /* height: 100vh; /* Set canvas height to full viewport height */ 
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the canvas */
+    border: 3px solid black;
+    background-color: #fff; /* White background color for canvas */
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1); /* Add shadow effect */
+}
+
+p {
+    background-color: #333; /* Dark background color for text */
+    color: white; /* White text color */
+    padding: 10px; /* Add padding */
+    text-align: center; /* Center text */
+}

@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="game.css">
+    <script src='game.js'></script>
+    <link rel="icon" href="icon.ico" type="image/x-icon">
+</head>
+<body>
+    <div class="navbar">
+        <img src="" id ="pro"alt="User Image" style="width: 50px; height: 50px; border-radius: 50%;">
+        <h1 id="login"></h1>
+        <h1>PING PONG</h1>
+        <div>
+            <button id="logoutButton">Exit</button>
+        </div>
+    </div>
+    <div id="game-serface">
+        <div id="loader"></div>
+    </div>
+    <div id="ping-pong">
+        <div class="users">
+            <div class="user1">
+                <!--src="https://cdn.intra.42.fr/users/9c7c59de228285641f8bb4f2406eac94/moelkama.JPG"-->
+                <img id="canvas-icon-id-0" class="icon">
+                <h2 id="canvas-display_name-id-0" class="display-name"></h2>
+            </div>
+            <div class="user2">
+                <h2 id="canvas-display_name-id-1" class="display-name"></h2>
+                <img id="canvas-icon-id-1" class="icon">
+            </div>
+        </div>
+        <canvas id="canvas-id" class="canvas" width="600px" height="300px"></canvas>
+    </div>
+    </body>
+</html>
