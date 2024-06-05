@@ -20,10 +20,6 @@ body {
     font-size: 20px; /* Increase font size */
 }
 
-#pro {
-    border: 2px solid white; /* Add border around user image */
-}
-
 button {
     padding: 10px 20px;
     font-size: 16px;
@@ -86,6 +82,7 @@ button {
 }
 
 #loader {
+    display: none;
     border: 16px solid #f3f3f3;
     border-top: 16px solid #3498db; /* Blue */
     border-radius: 50%;
@@ -98,9 +95,9 @@ button {
     100% { transform: rotate(360deg); }
 }
 
-#ping-pong{
-    width: 600px;
+.ping-pong{
     display: none;
+    width: 600px;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -139,4 +136,99 @@ button {
     height: 50px;
     width: 50px;
     border-radius: 25px;
+}
+
+.tournament {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.round {
+    /* background-color: beige; */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 200px;
+    height: 800px;
+    margin: 0 40px;
+}
+
+.matchup {
+    /* background-color: yellow; */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 180px;
+    margin: 10px 0;
+}
+
+.player {
+    border: 1px solid #000;
+    background-color: yellow;
+    padding: 10px;
+    border-radius: 20px;
+    text-align: center;
+    height: inherit;
+    align-items: center;
+    display: flex;
+}
+
+.champion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.champion .player {
+    font-weight: bold;
+    height: 50px;
+    width: 150px;
+    background-color: #f0f0f0;
+}
+/*8888888888888888888888888888888888888888888*/
+.menu {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%; /* Adjust the width as needed */
+    max-width: 400px;
+    background-color: #333;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Add shadow effect */
+    padding: 20px;
+    z-index: 1000;
+    overflow-y: auto; /* Enable vertical scrolling if needed */
+}
+
+.menu.show {
+    display: block;
+}
+
+.menu-btn {
+    display: block;
+    width: 100%;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.menu-btn:hover {
+    background-color: #45a049;
 }
