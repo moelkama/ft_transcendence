@@ -1,10 +1,17 @@
 var url;
 
-elem = NaN
-ctx = NaN
-width = 0
-height = 0
-main_socket = NaN
+var main_socket = NaN;
+var elem = NaN;
+var ctx = NaN;
+var width = NaN;
+var height = NaN;
+
+window.onload = function() {
+    elem = document.getElementById("4-canvas-id")
+    ctx = elem.getContext("2d");
+    width = elem.width
+    height = elem.height
+};
 
 function draw_ball(b)
 {
@@ -44,25 +51,80 @@ function draw(data)
     draw_ball(data.ping);
     put_score(data.team1_score, width / 2 + (40), 20 / 100 * height);
     put_score(data.team2_score, width / 2 - (60 + 10), 20 / 100 * height);
-    // requestAnimationFrame(draw);
 }
 
 var firs_time = true;
-function    display_ping_pong(data)
+
+function    active_section(section_id)
+{
+    document.querySelectorAll('section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.getElementById(section_id).classList.add('active');
+}
+
+function    display_ping_pong(data, section_id)
 {
     if (firs_time)
     {
-        console.log("hellooooo")
+        console.log("hellooooo", section_id);
         for (let i = 0; i < data.players.length; i++)
         {
             console.log(data.players[i].user.login);
+            console.log(data.players.length.toString() + "-canvas-display_name-id-" + i.toString());
             document.getElementById(data.players.length.toString() + "-canvas-display_name-id-" + i.toString()).innerHTML = data.players[i].user.login;
             // document.getElementById(data.players.length.toString() + "-canvas-icon-id-" + i.toString()).src = data.players[i].user.icon;
         }
-        document.getElementById("ping-pong-" + data.players.length.toString()).style.display = "block";
-        // document.getElementById("loader").style.display = "none";
+        active_section(section_id);
         firs_time = false
     }
+}
+
+function showResult(result)
+{
+    const message = document.getElementById('resultMessage');
+
+    var id = 'resultModal';
+    if (result == 'Winner')
+    {
+        message.textContent = 'You Win!';
+        message.style.color = 'green';
+        // document.getElementById('result-gif').src = "https://cdn.dribbble.com/users/7421625/screenshots/18722898/media/9dc2ccd128c89b19dddd55447ba5e1d0.gif"
+        document.getElementById('result-gif').src = "https://mir-s3-cdn-cf.behance.net/project_modules/disp/e70bcc65284623.5aef51b58b0c9.gif";
+    }
+    else if (result == 'Loser')
+    {
+        message.textContent = 'You Lose!';
+        message.style.color = 'red';
+        document.getElementById('result-gif').src = "https://www.shutterstock.com/shutterstock/photos/449380606/display_1500/stock-vector-you-lose-comic-speech-bubble-cartoon-game-assets-449380606.jpg"
+    }
+    active_section(id);
+    // document.getElementById('resultModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('resultModal').classList.remove('active');
+}
+
+var round = 0;
+function    tournament_info(players, section_id)
+{
+    active_section(section_id);
+    for (let i = 0; i < players.length; i++)
+    {
+        var container = document.getElementById(round.toString() + i.toString());
+        var icon = document.createElement("img");
+        icon.className = "icon";
+        icon.src = 'https://cdn.intra.42.fr/users/9c7c59de228285641f8bb4f2406eac94/moelkama.JPG'
+        // icon.src = players[i].icon
+        var display_name = document.createElement("h2");
+        display_name.id = "user-display-name"
+        display_name.textContent = players[i].login;
+        // display_name.textContent = i;
+        container.appendChild(icon);
+        container.appendChild(display_name);
+    }
+    round++;
 }
 
 document.addEventListener("keydown", (event) => {
@@ -77,31 +139,74 @@ document.addEventListener("keyup", (event) => {
         main_socket.send(JSON.stringify('Stop'));
 });
 
-async function fetchData(url) {
-    const response = await fetch(url);
-    if (!response.ok) {
+async function get_url(socket_url)
+{
+    const response = await fetch('/api/get_session/');
+    if (!response.ok)
         throw new Error('Network response was not ok ' + response.statusText);
+    data =  await response.json();
+    return `wss://${window.location.host}${socket_url}?id=${data.user_id}&token=${data.token}`;
+}
+
+async function run(section_id, socket_url, canvas_id)
+{
+    try
+    {
+        firs_time = true;
+        round = 0;
+        if (main_socket)
+            main_socket.close(1000, 'Normal Closure');
+        elem = document.getElementById(canvas_id);
+        ctx = elem.getContext("2d");
+        width = elem.width
+        height = elem.height
+        main_socket = new WebSocket(await get_url(socket_url));
+
+        // active_section('loading-section-id');
+        active_section(section_id);
+        main_socket.onopen = function(event) {
+            console.log("WebSocket connection established.");
+        };
+
+        main_socket.onmessage = function (e)
+        {
+            var data = JSON.parse(e.data)
+            console.log(data);
+            if (data.type == 'game.state')
+            {
+                display_ping_pong(data, section_id);
+                draw(data);
+            }
+            else if (data.type == 'tournament.info')
+            {
+                tournament_info(data.players, 'play_tournament');
+                firs_time = true;
+            }
+            else if (data.type == 'game.end')
+                showResult(data.result);
+            else if (data.type == 'tournament.end')
+                active_section('win-tournament-id');
+        }
     }
-    return await response.json();
+    catch (error)
+    {
+        console.error('Error fetching data:', error);
+    }
+}
+
+function navigate(section_id) {
+    if (section_id == 'play')
+        run('play', '/wss/game/', '2-canvas-id');
+    else if (section_id == 'play_tournament')
+        run('play', '/wss/tournament/', '2-canvas-id');
+    else if (section_id == 'ping-pong-4')
+        run('play-4', '/wss/four_players/', '4-canvas-id');
+    else
+        active_section(section_id);
 }
 
 // Call fetchData using async/await
 // var data = NaN
-// async function main()
-// {
-//     try
-//     {
-//         const response = await fetch('/api/get_session/');
-//         if (!response.ok)
-//             throw new Error('Network response was not ok ' + response.statusText);
-//         data =  await response.json();
-//         console.log(data);
-//     }
-//     catch (error)
-//     {
-//         console.error('Error fetching data:', error);
-//     }
-// }
 
 // main();
 // url = `wss://${window.location.host}/wss/game/?id=${data.user_id}&token=${data.token}`;

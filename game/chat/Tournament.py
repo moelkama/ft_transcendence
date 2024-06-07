@@ -1,11 +1,10 @@
 import asyncio, json, math, random
 # from chat.game import serialize_pingpong
 from datetime import datetime
-from chat.game import Match, serialize_Match, racket, height, hh, width, ww
-
+from chat.cons import Match, serialize_Match, racket, height, hh, width, ww, score_to_win, User
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
-from auth_app.models import User
+from . views import endpoint
 
 N = 4
 waiting = {}
@@ -34,17 +33,18 @@ async def full_tournament(users):
         await tournaments[tournament_name][group_name].players[0].channel_layer.group_send(tournament_name,
         {
             'type': 'send_info',
-            'info':json.dumps({'type':'tournament.info', 'players':[u.user.serialize_user() for u in users]})
+            'info':json.dumps({'type':'tournament.info', 'players':[{'login':u.user.username, 'icon':u.user.photo_profile} for u in users]})
         })
         users.clear()
         await asyncio.sleep(3)
         tasks = [asyncio.create_task(run_game(m)) for m in tournaments[tournament_name].values()]
         users = await asyncio.gather(*tasks)
-        users = sorted(users, key=lambda item: item.next_index)
         tasks.clear()
         tournaments[tournament_name].clear()
+        users = sorted(users, key=lambda item: item.next_index)
+        await asyncio.sleep(3)
     if len(users) > 0:
-        await users[0].send(json.dumps({'type':'tournament.end', 'result':'bouyah'}))
+        await users[0].send(json.dumps({'type':'tournament.end', 'result':'Booyah'}))
     users.clear()
 
 async def run_game(match):
@@ -56,6 +56,7 @@ async def run_game(match):
             'type': 'send_state',
             'pingpong':json.dumps(match, default=serialize_Match)
         })
+        await asyncio.sleep(0.001)
         if (match.team2_score == score_to_win):
             await match.players[0].send(json.dumps({'type':'game.end', 'result':'Winner'}))
             await match.players[1].send(json.dumps({'type':'game.end', 'result':'Loser'}))
@@ -84,7 +85,6 @@ async def run_game(match):
             match.players[0].avaible = False
             await match.players[0].close()
             return match.players[1]
-        await asyncio.sleep(0.001)
     if match.players[0].avaible:
         await match.players[0].send(json.dumps({'type':'game.end', 'result':'Winner'}))
         return (match.players[0])
@@ -101,8 +101,12 @@ class   Tournament(AsyncWebsocketConsumer):
         self.tournament_name = "None"
         self.group_name = "None"
         self.avaible = True
-        access_token = self.scope['query_string'].decode().split('=')[1]
-        self.user = await sync_to_async(User.objects.get)(token_access=access_token)
+        # access_token = self.scope['query_string'].decode().split('=')[1]
+        # self.user = await sync_to_async(User.objects.get)(token_access=access_token)
+        query_string = self.scope['query_string'].decode()
+        query_params = dict(param.split('=') for param in query_string.split('&'))
+        data = endpoint(query_params.get('token'), query_params.get('id'))
+        self.user = User(data)
         self.user.x = x
         x += 1
         await self.channel_layer.group_add('global_group', self.channel_name)
@@ -129,7 +133,7 @@ class   Tournament(AsyncWebsocketConsumer):
             await self.send(event['pingpong'])
 
     async def disconnect(self, code):
-        if self.user.login in waiting:
+        if self.user.username in waiting:
             del waiting[self.user.login]
         else:
             if self.avaible:

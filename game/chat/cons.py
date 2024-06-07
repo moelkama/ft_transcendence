@@ -1,5 +1,6 @@
 import asyncio, json, math
-
+from datetime import datetime
+from . views import endpoint
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 # from auth_app.models import User
@@ -163,24 +164,22 @@ def serialize_Match(o):
         'team2_score':o.team2_score,
     }
 
-from datetime import datetime
-from . views import endpoint
 rooms = {}
 group_name = 'Match_' + datetime.now().time().strftime("%H_%M_%S_%f")
 
+class   User:
+    def __init__(self, dict):
+        for key, value in dict.items():
+            setattr(self, key, value)
+
 class RacetCunsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        class   User:
-            def __init__(self, dict):
-                for key, value in dict.items():
-                    setattr(self, key, value)
         print("----------------connect----------------")
         global group_name
         await self.accept()
         self.avaible = True
         query_string = self.scope['query_string'].decode()
         query_params = dict(param.split('=') for param in query_string.split('&'))
-
         data = endpoint(query_params.get('token'), query_params.get('id'))
         self.user = User(data)
         self.group_name = group_name
@@ -213,5 +212,5 @@ class RacetCunsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.group_name,
         {
             'type': 'send_data',
-            'data': json.dumps({'type':'game.end', 'result':'win'})
+            'data': json.dumps({'type':'game.end', 'result':'Winner'})
         })

@@ -1,9 +1,9 @@
 import asyncio, json
-from chat.game import Match, racket, height, width, ww
+from chat.cons import Match, racket, height, width, ww, User
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
-from auth_app.models import User
 from datetime import datetime
+from . views import endpoint
 
 rooms = {}
 waiting = {}
@@ -73,7 +73,6 @@ async def four_players_game(users):
     rooms[group_name] = Match_4_players(N)
     i = 0
     for u in users:
-        print(i, "==========>", u.user.login)
         u.group_name = group_name
         await u.channel_layer.group_add(group_name, u.channel_name)
         u.racket = racket(int(i / 2) * (width - ww), (i % 2) * int(height / 2) + int(height / 4), (i % 2) * int(height / 2), int(height / 2) + (i % 2) * int(height / 2))
@@ -97,9 +96,13 @@ class   four_players(AsyncWebsocketConsumer):
         print("--------------four_players---------------")
         await self.accept()
         self.avaible = True
-        access_token = self.scope['query_string'].decode().split('=')[1]
-        self.user = await sync_to_async(User.objects.get)(token_access=access_token)
-        # waiting[self.user.login] = self
+        # access_token = self.scope['query_string'].decode().split('=')[1]
+        # self.user = await sync_to_async(User.objects.get)(token_access=access_token)
+        query_string = self.scope['query_string'].decode()
+        query_params = dict(param.split('=') for param in query_string.split('&'))
+        data = endpoint(query_params.get('token'), query_params.get('id'))
+        self.user = User(data)
+        # waiting[self.user.username] = self
         waiting[str(x)] = self
         # self.index = x
         x += 1
@@ -118,5 +121,5 @@ class   four_players(AsyncWebsocketConsumer):
 
     async def disconnect(self, code):
         self.avaible = False
-        if self.user.login in waiting:
-            del waiting[self.user.login]
+        if self.user.username in waiting:
+            del waiting[self.user.username]
