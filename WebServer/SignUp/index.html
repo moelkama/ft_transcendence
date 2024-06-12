@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Form</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function get_csrf_token(){
+            fetch('/api/csrf-token/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('csrfToken').value = data.csrfToken;
+            })
+            .catch(error => console.error('Error fetching CSRF token:', error));
+        }
+        get_csrf_token();
+    </script>
+</head>
+<body>
+    <form method="post" action="/account/registeruser/" enctype="multipart/form-data">
+        <input type="hidden" name="csrfmiddlewaretoken" id="csrfToken">
+        <input type="text" id="username" name="username" placeholder="Username"><br>
+        <input type="text" id="first_name" name="first_name" placeholder="First Name"><br>
+        <input type="text" id="last_name" name="last_name" placeholder="Last Name"><br>
+        <input type="email" id="email" name="email" placeholder="Email"><br>
+        <input type="password" id="password1" name="password1" placeholder="Password"><br>
+        <input type="password" id="password2" name="password2" placeholder="Confirm Password"><br>
+        <button type="submit">Register</button>
+        <a href="/SignIn/">Back to Login</a>
+    </form>
+</body>
+</html>

@@ -98,10 +98,9 @@ class   four_players(AsyncWebsocketConsumer):
         self.avaible = True
         # access_token = self.scope['query_string'].decode().split('=')[1]
         # self.user = await sync_to_async(User.objects.get)(token_access=access_token)
-        query_string = self.scope['query_string'].decode()
-        query_params = dict(param.split('=') for param in query_string.split('&'))
-        data = endpoint(query_params.get('token'), query_params.get('id'))
-        self.user = User(data)
+        query_string = self.scope['query_string'].decode().split('=')[1]
+        data = endpoint(query_string)
+        self.user = User(data[0])
         # waiting[self.user.username] = self
         waiting[str(x)] = self
         # self.index = x

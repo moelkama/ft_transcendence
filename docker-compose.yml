@@ -17,6 +17,7 @@ services:
       - .env
     depends_on:
       - Database
+
   game:
     image: djangoo
     container_name: game
@@ -27,7 +28,6 @@ services:
     depends_on:
       - auth
       - Database
-
 
   webserver:
     build: WebServer

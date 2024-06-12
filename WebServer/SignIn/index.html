@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Register Forms</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function get_csrf_token() {
+                fetch('/api/csrf-token/')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('csrfToken').value = data.csrfToken;
+                })
+                .catch(error => console.error('Error fetching CSRF token:', error));
+            }
+            get_csrf_token();
+            document.querySelector('form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+                const csrfToken = document.getElementById('csrfToken').value;
+
+                fetch('/account/loginuser/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const messageDiv = document.createElement('div');
+                    if (data.alert === 'ok') {
+                        messageDiv.classList.add('alert', 'alert-success');
+                        messageDiv.textContent = 'Login successful!';
+                        window.location.href = data.redirect_url;
+                    } else {
+                        messageDiv.classList.add('alert', 'alert-danger');
+                        messageDiv.textContent = `Error: ${data.alert}`;
+                    }
+                    document.body.appendChild(messageDiv);
+                })
+                .catch(error => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('alert', 'alert-danger');
+                    messageDiv.textContent = `An error occurred: ${error}`;
+                    document.body.appendChild(messageDiv);
+                });
+            });
+        });
+    </script>
+    <form method="post" action="/account/loginuser/">
+        <input type="hidden" name="csrfmiddlewaretoken" id="csrfToken"/>
+        <h2>Login</h2>
+        <input name="username" type="text" placeholder="Username" required/>
+        <input name="password" type="password" placeholder="Password" required/>
+        <button type="submit">Login</button>
+        <a href="/SignUp/">Create an account</a><br>
+        <div class="reset-password">Forgot password? <a href="/reset_password/">Reset</a></div>
+    </form>
+</body>
+</html>

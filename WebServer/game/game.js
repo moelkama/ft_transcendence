@@ -1,24 +1,24 @@
-var url;
+// var url;
 
 var main_socket = NaN;
 var elem = NaN;
 var ctx = NaN;
-var width = NaN;
-var height = NaN;
+var width = 0;
+var height = 0;
 
-window.onload = function() {
-    elem = document.getElementById("4-canvas-id")
-    ctx = elem.getContext("2d");
-    width = elem.width
-    height = elem.height
-};
+// window.onload = function() {
+//     elem = document.getElementById("4-canvas-id")
+//     ctx = elem.getContext("2d");
+//     width = elem.width
+//     height = elem.height
+// };
 
 function draw_ball(b)
 {
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
     ctx.stroke();
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = 'white';
     ctx.fill();
 }
 
@@ -28,6 +28,8 @@ function put_center()
     ctx.moveTo(width / 2, 0);
     ctx.lineTo(width / 2, height);
     ctx.stroke();
+    ctx.fillStyle = 'white';
+    ctx.fill();
 }
 
 function put_score(score, x, y)
@@ -38,7 +40,7 @@ function put_score(score, x, y)
 
 function draw_racket(racket)
 {
-    ctx.fillStyle = "red";
+    ctx.fillStyle = 'white';
     ctx.fillRect(racket.x, racket.y, racket.w, racket.h);
 }
 
@@ -73,6 +75,7 @@ function    display_ping_pong(data, section_id)
             console.log(data.players[i].user.login);
             console.log(data.players.length.toString() + "-canvas-display_name-id-" + i.toString());
             document.getElementById(data.players.length.toString() + "-canvas-display_name-id-" + i.toString()).innerHTML = data.players[i].user.login;
+            console.log(data.players[i].user.icon);
             // document.getElementById(data.players.length.toString() + "-canvas-icon-id-" + i.toString()).src = data.players[i].user.icon;
         }
         active_section(section_id);

@@ -28,29 +28,12 @@ function get_csrf_token(){
     })
     .catch(error => console.error('Error fetching CSRF token:', error));
 }
+
 function getProfile() {
-    fetch('/api/get_session/')
+    fetch('/api/data/')
     .then(response => {
         if (!response.ok) {
-            window.location.href = "/login/";
-        }
-        return response.json();
-    })
-    .then(data => {
-        const userId = data.user_id;
-        const token = data.token;
-        const url = `https://127.0.0.1/api/tasks/${userId}`;
-        return fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Token ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+            window.location.href = "/";
         }
         return response.json();
     })

@@ -23,13 +23,13 @@
             <h3 id ="blackhole"></h3>
             <h3 id ="level"></h3>
         </div>
-        <form id="avatarForm" class="form-container" method="post" enctype="multipart/form-data" action="/update-profile/">
+        <form id="avatarForm" class="form-container" method="post" enctype="multipart/form-data" action="/update_profile/">
             <input type="hidden" name="csrfmiddlewaretoken" id="csrfToken1">
             <label for="image">Choose an image to upload:</label>
             <input type="file" id="image" name="image" accept="image/*" required>
             <button type="submit">Upload</button>
         </form>
-        <form id="userform" class="form-container" method="post" enctype="multipart/form-data" action="/update-username/">
+        <form id="userform" class="form-container" method="post" enctype="multipart/form-data" action="/update_username/">
             <input type="hidden" name="csrfmiddlewaretoken" id="csrfToken">
             <label for="usernameInput">New Username:</label>
             <input type="text" id="usernameInput" name="username" required>

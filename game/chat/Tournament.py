@@ -1,12 +1,12 @@
 import asyncio, json, math, random
 # from chat.game import serialize_pingpong
 from datetime import datetime
-from chat.cons import Match, serialize_Match, racket, height, hh, width, ww, score_to_win, User
+from chat.cons import Match, serialize_Match, User, racket, height, hh, width, ww, score_to_win
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from . views import endpoint
 
-N = 4
+N = 8
 waiting = {}
 tournaments = {}
 
@@ -36,7 +36,7 @@ async def full_tournament(users):
             'info':json.dumps({'type':'tournament.info', 'players':[{'login':u.user.username, 'icon':u.user.photo_profile} for u in users]})
         })
         users.clear()
-        await asyncio.sleep(3)
+        await asyncio.sleep(5)
         tasks = [asyncio.create_task(run_game(m)) for m in tournaments[tournament_name].values()]
         users = await asyncio.gather(*tasks)
         tasks.clear()
@@ -103,10 +103,9 @@ class   Tournament(AsyncWebsocketConsumer):
         self.avaible = True
         # access_token = self.scope['query_string'].decode().split('=')[1]
         # self.user = await sync_to_async(User.objects.get)(token_access=access_token)
-        query_string = self.scope['query_string'].decode()
-        query_params = dict(param.split('=') for param in query_string.split('&'))
-        data = endpoint(query_params.get('token'), query_params.get('id'))
-        self.user = User(data)
+        query_string = self.scope['query_string'].decode().split('=')[1]
+        data = endpoint(query_string)
+        self.user = User(data[0])
         self.user.x = x
         x += 1
         await self.channel_layer.group_add('global_group', self.channel_name)

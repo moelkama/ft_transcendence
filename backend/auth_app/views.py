@@ -57,6 +57,8 @@ def store_data_in_database(request,access_token):
             user.first_name = user_data['displayname'].split(' ')[0]
             user.last_name = user_data['displayname'].split(' ')[1]
             user.save()
+            profile.first_name = user_data['displayname'].split(' ')[0]
+            profile.last_name = user_data['displayname'].split(' ')[1]
             profile.username = user_data['login']
             profile.save()
         else :

@@ -3,6 +3,7 @@ from datetime import datetime
 from . views import endpoint
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
+import requests
 # from auth_app.models import User
 
 width = 600
@@ -142,6 +143,7 @@ class   Match:
         return 2
 
 async def start_game(group_name):
+    print("----------start_game_________")
     winner = await rooms[group_name].run_game()
     result = ['Winner', 'Winner']
     if winner == 1:
@@ -174,15 +176,15 @@ class   User:
 
 class RacetCunsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("----------------connect----------------")
+        print("___________________connect___________________")
         global group_name
         await self.accept()
         self.avaible = True
-        query_string = self.scope['query_string'].decode()
-        query_params = dict(param.split('=') for param in query_string.split('&'))
-        data = endpoint(query_params.get('token'), query_params.get('id'))
-        self.user = User(data)
+        query_string = self.scope['query_string'].decode().split('=')[1]
+        data = endpoint(query_string)
+        self.user = User(data[0])
         self.group_name = group_name
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
         if self.group_name in rooms:
             if rooms[self.group_name].players[0].user.username != self.user.username:
                 self.racket = racket(width - ww, (height - hh) / 2, 0, height)
@@ -193,7 +195,6 @@ class RacetCunsumer(AsyncWebsocketConsumer):
             self.racket = racket(0, (height - hh) / 2, 0, height)
             rooms[self.group_name] = Match(2)
             rooms[self.group_name].set_player(self, 0)
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
 
     async def receive(self, text_data):
         global rooms

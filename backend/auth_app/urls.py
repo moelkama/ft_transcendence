@@ -13,5 +13,8 @@ urlpatterns = [
     path('exit/',login.exit,name='exit'),
     path('tasks/', TaskListCreateAPIView.as_view(), name='task-list-create'),
     path('tasks/<int:pk>/', TaskRetrieveUpdateDestroyAPIView.as_view(), name='task-retrieve-update-destroy'),
-    path('get_session/', login.get_session, name='get_session'),
+    path('data/', login.data, name='data'),
+    path('token/', login.token, name='session'),
+    path('update_profile/', login.update_profile, name='update_profile'),
+    path('update_username/', login.update_username, name='update_username'),
 ]

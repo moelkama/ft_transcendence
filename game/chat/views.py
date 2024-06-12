@@ -3,13 +3,16 @@ import requests
 # Create your views here.
 # from auth_app.models import User
 
-def endpoint(token, id):
+def endpoint(token):
     headers = {'Authorization': f'Token {token}'}
-    url = f'http://auth:8000/api/tasks/{id}/'
+    url = f'http://auth:8000/tasks/'
     response = requests.get(url, headers=headers)
     data = None
+
     if response.status_code == 200:
         data = response.json()
+        for task in data:
+            task['photo_profile'] = task['photo_profile'].replace('http://auth:8000/', '')
     return data
 
 def ft(request):

@@ -1,10 +1,11 @@
-from django.contrib.auth import logout as my_logout
+from django.contrib.auth import logout as log
 from django.http import HttpResponseBadRequest
 from UserManagement.models import UserPro 
 from django.shortcuts import  redirect
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
+from . serializers import TaskSerializer
 
 def login_required(request):
     access_token = request.session.get('user_id')
@@ -15,22 +16,41 @@ def login_required(request):
     return user
    
 def logout(request):
-    my_logout(request)
-    request.session.set_expiry(0)
-    return redirect('/login/')
+    log(request)
+    return redirect('/')
 
 def exit():
     return redirect('/game/')
 
-
-def get_session(request):
+def data(request):
     user = login_required(request)
     if not user:
         return HttpResponseBadRequest("Forbidden", status=403)
-    user_id = request.session.get('user_id')
+    dataseriaser = TaskSerializer(user)
+    return JsonResponse(dataseriaser.data)
+
+def token(request):
+    user = login_required(request)
+    if not user:
+        return HttpResponseBadRequest("Forbidden", status=403)
     token = request.session.get('token')
-    contex = {'user_id': user_id, 'token': token}
+    contex = {'token': token}
     return JsonResponse(contex)
+
+def update_profile(request):
+    if request.method == 'POST':
+        user = login_required(request)
+        user.photo_profile = request.FILES.get('image')
+        print(user.photo_profile)
+        user.save()
+    return redirect('/profile/')
+
+def update_username(request):
+    if request.method == 'POST':
+        user = login_required(request)
+        user.username = request.POST.get('username')
+        user.save()
+    return redirect('/profile/')
 
 @csrf_exempt
 def csrf_token(request):
