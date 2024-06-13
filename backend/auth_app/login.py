@@ -23,20 +23,17 @@ def get_match_history(request):
             return JsonResponse({'status': False, 'message': 'User not found'}, status=404)
         match_history = all_Match.objects.filter(winner=user)
         match_history2 = all_Match.objects.filter(loser=user)
-        data1 = []
-        data2 = []
+        data = []
         for match in match_history:
             datawinner = TaskSerializer(CustomUser.objects.get(id=match.winner.id))
             datalooser = TaskSerializer(CustomUser.objects.get(id=match.loser.id))
-            data1.append({'winner': datawinner.data, 'loser': datalooser.data, 'date': match.date, 'score1': match.score1, 'score2': match.score2})
+            data.append({'winner': datawinner.data, 'loser': datalooser.data, 'date': match.date, 'score1': match.score1, 'score2': match.score2})
         for match in match_history2:
             datawinner = TaskSerializer(CustomUser.objects.get(id=match.winner.id))
             datalooser = TaskSerializer(CustomUser.objects.get(id=match.loser.id))
-            data2.append({'winner': datawinner.data, 'loser': datalooser.data, 'date': match.date, 'score1': match.score1, 'score2': match.score2})
-        all_data = {'winMatch': data1, 'loseMatch': data2}
-        all_data['winMatch'] = sorted(all_data['winMatch'], key=lambda x: x['date'], reverse=True)
-        all_data['loseMatch'] = sorted(all_data['loseMatch'], key=lambda x: x['date'], reverse=True)
-        return JsonResponse(all_data, safe=False)
+            data.append({'winner': datawinner.data, 'loser': datalooser.data, 'date': match.date, 'score1': match.score1, 'score2': match.score2})
+        data = sorted(data, key=lambda x: x['date'], reverse=True)
+        return JsonResponse(data, safe=False)
     else:
         return JsonResponse({'status': False, 'message': 'Invalid request method'}, status=405)
     
@@ -70,7 +67,7 @@ def leadrboard(request):
         user.ranking = calculate_ranking(user)
         user.total_match = user.win + user.lose
         data.append(user)
-        if len(data) == 5:
+        if len(data) == 7:
             break
     dataseriaser = TaskSerializer(data, many=True)
     return JsonResponse(dataseriaser.data,safe=False)

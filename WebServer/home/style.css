@@ -800,8 +800,7 @@ html {
   }
 
   /*88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888*/
-
-button {
+  button {
     padding: 10px 20px;
     font-size: 16px;
     color: white;
@@ -1031,4 +1030,38 @@ section.active {
 {
     height: 100%;
     width: 100%;
+}
+
+.student-list {
+  max-width: 220px;
+  margin: 20px auto;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.student {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.student:last-child {
+  border-bottom: none;
+}
+
+.student-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.student-name {
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  color: #333;
 }

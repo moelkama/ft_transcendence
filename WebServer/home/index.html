@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
-    <script src="game.js"></script>
     <link rel="icon" href="icon.ico" type="image/x-icon">
 </head>
 <body>
@@ -14,12 +12,12 @@
     <div class="ball2"></div>
     <nav class="navbar">
         <div class="navbar-logo">
-            <a class="nav-link"><img src="./resrc/media/logo.png" onclick="active_section('play')" alt="Logo"></a>
+            <a class="nav-link" data-target="home"><img src="./resrc/media/logo.png" alt="Logo" onclick="active_section('play')"></a>
         </div>
         <div class="navbar-buttons">
             <ul>
                 <li><a class="nav-link" data-target="home" href="#home" onclick="disactiv_sections()">Home</a></li>
-                <li><a class="nav-link" data-target="profile" href="#profile" onclick="disactiv_sections()">Profile</a></li>
+                <li><a class="nav-link" data-target="profile" href="#profile"  onclick="disactiv_sections()">Profile</a></li>
                 <li><div class="profil" id="imageprofile"></div></li>
             </ul>
         </div>
@@ -50,7 +48,7 @@
                 </div>
                 <div class="game">
                     <img src="./resrc/ai_game.jpeg" alt="">
-                    <button onclick="navigate('play_tournament')">Play Tournament</button>
+                    <button onclick="navigate('play_tournament')">play Tournament</button>
                 </div>
                 <div class="challenge">
                     <div class="center">
@@ -67,42 +65,32 @@
             </div>
             <div id="profile" class="content-section profile">
                 <div class="welcome">
-                    <div>
+                    <div id="profileid">
                         <!-- <div class="image_to_profile"></div> -->
-                            <img id="profileid" src="" alt="profile">
-                        <h3 id="login">yakhay</h3>
+                        <h3 id="login"></h3>
                     </div>
                     <div>
                         <div class="rank"></div>
                         <h3 id="content_rank"></h3>
                     </div>
                     <div class="scor">
-                        <div><h1>scor</h1></div>
+                        <div><h1>Score</h1></div>
                         <div id="content_scor"></div>
                     </div>
                 </div>
                 <div class="data">
                     <div class="leadrboard" id="leadrboard">
-                        <!-- <div class="data_titel"><h2>leadrboard</h2></div>
-                        <p id="userone"> <img id="image1"src="" > </p>
-                        <p id="usertwo"> <img id="image2"src="" ></p>
-                        <p id="userthree"><img id="image3"src="" ></p>
-                        <p id="userfour"><img id="image4"src="" ></p>
-                        <p id="userfive"><img id="image5"src="" ></p> -->
+                        <div class="data_titel"><h2>leadrboard</h2></div>
                     </div>
-                    <div class="global_data">
-                        <div class="data_titel">
-                            <a href="#"><h2>friends</h2></a>
-                            <a href="#"><h2>match history</h2></a>
-                            <a href="#"><h2>channels</h2></a>
-                        </div>
-                        <h1 id="totalid"></h1>
-                        <h1 id="loseid"></h1>
-                        <h1 id="winid"></h1>
+                    
+                    <div class="global_data" id="history">
+                        <div class="data_titel" ><h2>match history</h2></div>
                     </div>
+                    
                     <div class="achievements" id="achievements">
                         <div class="data_titel"><h2>achievements</h2></div>
                     </div>
+                    
                 </div>
             </div>
             <div id="chat" class="content-section aside-co">
@@ -131,7 +119,7 @@
                 <div class="notification-contiener">
                     <!-- <span class="close" onclick="closeNotificationsModal()">&times;</span> -->
                     <div class="modal-content">
-                    <span class="close" onclick="closeNotificationsModal()">&times;</span>
+                        <span class="close" onclick="closeNotificationsModal()">&times;</span>
                     </div>
                 </div>
             </div>
@@ -144,32 +132,31 @@
                     <button class="cancel-button" onclick="closeLogoutModal()">No</button>
                 </div>
             </div>
-        
+            
             <div id="settings-modal" class="settings-modal">
                 <div class="setting-contiener">
                     <div class="modal-content">
                         <span class="close" onclick="closeSettingsModal()">&times;</span>
                     </div>
-                    <div>
-                        <h2>Edit Profile</h2>
+                    <div id = "editprofile">
                         <div class="settings-form" id="settings-form">
                             <!-- <img id="editimage" src="" alt="profile"> -->
                             <!-- <label for="profileImage">new Profile Image</label> -->
                             <!-- <img id="profileImagePreview" src="default-profile.png" alt="Profile Image" class="profile-image"> -->
                             <!-- <input type="file" id="profileImage" accept="image/*" onchange="previewImage(event)">
                                 < -->
-                            <label id="nameprofile" for="username"></label>
-                            <form id="avatarForm" class="form-container" method="post" enctype="multipart/form-data" action="/update_profile/">
-                                <input type="hidden" name="csrfmiddlewaretoken" id="csrfToken">
-                                <input type="file" id="image" name="image" accept="image/*" required>
-                                <input type="text" id="username" name="username" placeholder="Username" required>
-                                <button type="submit">Upload</button>
-                                <div id="messages"></div>
-                            </form>
-                            <!-- <button class="save-button" onclick="saveSettings()">Save Changes</button> -->
+                                <label id="nameprofile" for="username"></label>
+                                <form id="avatarForm" class="form-container" method="post" enctype="multipart/form-data" action="/update_profile/">
+                                    <input type="hidden" name="csrfmiddlewaretoken" id="crcf">
+                                    <input type="file" id="image" name="image" accept="image/*" required>
+                                    <input type="text" id="username" name="username" placeholder="Username" required>
+                                    <button type="submit">Upload</button>
+                                    <div id="messages"></div>
+                                </form>
+                                <!-- <button class="save-button" onclick="saveSettings()">Save Changes</button> -->
+                            </div>
                         </div>
                     </div>
-                </div>
             </div>
             <section id="loading-section-id">
                 <div id="loading">
@@ -203,20 +190,20 @@
             </section>
             <section id="play-4" >
                 <div class="ping-pong">
-                <div class="users">
-                    <div class="user1">
-                        <img id="4-canvas-icon-id-0" class="icon">
-                        <h2 id="4-canvas-display_name-id-0" class="display-name"></h2>
+                    <div class="users">
+                        <div class="user1">
+                            <img id="4-canvas-icon-id-0" class="icon">
+                            <h2 id="4-canvas-display_name-id-0" class="display-name"></h2>
+                        </div>
+                        <div class="user2">
+                            <h2 id="4-canvas-display_name-id-2" class="display-name"></h2>
+                            <img id="4-canvas-icon-id-2" class="icon">
+                        </div>
                     </div>
-                    <div class="user2">
-                        <h2 id="4-canvas-display_name-id-2" class="display-name"></h2>
-                        <img id="4-canvas-icon-id-2" class="icon">
-                    </div>
-                </div>
-                <canvas id="4-canvas-id" class="canvas" width="600px" height="300px"></canvas>
-                <div class="users">
-                    <div class="user1">
-                        <img id="4-canvas-icon-id-1" class="icon">
+                    <canvas id="4-canvas-id" class="canvas" width="600px" height="300px"></canvas>
+                    <div class="users">
+                        <div class="user1">
+                            <img id="4-canvas-icon-id-1" class="icon">
                         <h2 id="4-canvas-display_name-id-1" class="display-name"></h2>
                     </div>
                     <div class="user2">
@@ -225,26 +212,26 @@
                     </div>
                 </div>
             </div>
-            </section>
-            <section id="play_tournament">
-                <div id="tournament-id" class="tournament">
-                    <div class="round">
-                        <div class="matchup">
-                            <div id="00" class="player"></div>
-                            <div id="01" class="player"></div>
-                        </div>
-                        <div class="matchup">
-                            <div id="02" class="player"></div>
-                            <div id="03" class="player"></div>
-                        </div>
-                        <div class="matchup">
-                            <div id="04" class="player"></div>
-                            <div id="05" class="player"></div>
-                        </div>
-                        <div class="matchup">
-                            <div id="06" class="player"></div>
-                            <div id="07" class="player"></div>
-                        </div>
+        </section>
+        <section id="play_tournament">
+            <div id="tournament-id" class="tournament">
+                <div class="round">
+                    <div class="matchup">
+                        <div id="00" class="player"></div>
+                        <div id="01" class="player"></div>
+                    </div>
+                    <div class="matchup">
+                        <div id="02" class="player"></div>
+                        <div id="03" class="player"></div>
+                    </div>
+                    <div class="matchup">
+                        <div id="04" class="player"></div>
+                        <div id="05" class="player"></div>
+                    </div>
+                    <div class="matchup">
+                        <div id="06" class="player"></div>
+                        <div id="07" class="player"></div>
+                    </div>
                     </div>
                     <div class="round">
                         <div class="matchup">
@@ -267,50 +254,30 @@
                     </div>
                 </div>
             </section>
+            <section id="win-tournament-id">
+                <img id="win-tournament-background-id" src="https://cdn.dribbble.com/users/7421625/screenshots/18722898/media/9dc2ccd128c89b19dddd55447ba5e1d0.gif">
+            </section>
+            <section id="tournament_list" class="student-list">
+                <div class="student">
+                    <img src="mkatfi.jpeg" alt="Student Icon" class="student-icon">
+                    <span class="student-name">Student Name 1</span>
+                </div>
+                <div class="student">
+                    <img src="mkatfi.jpeg" alt="Student Icon" class="student-icon">
+                    <span class="student-name">Student Name 2</span>
+                </div>
+                <div class="student">
+                    <img src="mkatfi.jpeg" alt="Student Icon" class="student-icon">
+                    <span class="student-name">Student Name 3</span>
+                </div>
+            </section>
         </article>
     </div>
-        <!-- <section id="win-tournament-id">
-            <img id="win-tournament-background-id" src="https://cdn.dribbble.com/users/7421625/screenshots/18722898/media/9dc2ccd128c89b19dddd55447ba5e1d0.gif">
-        </section> -->
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            function get_csrf_token() {
-                fetch('/api/csrf-token/')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('csrfToken').value = data.csrfToken;
-                })
-                .catch(error => console.error('Error fetching CSRF token:', error));
-            }
-            get_csrf_token();
-            document.getElementById('avatarForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                const formData = new FormData(this);
-                const csrfToken = document.getElementById('csrfToken').value;
-                fetch('/update_profile/', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': csrfToken,
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === true) {
-                            window.location.href = "/home/";
-                    } else {
-                        document.getElementById('messages').innerHTML =  data.message;
-                        document.getElementById('messages').style.color = 'red';
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('messages').innerHTML = error;
-                    document.getElementById('messages').style.color = 'red';
-                });
-            });
-        });
-    </script>
+    <script src="game.js"></script>
+    <script src="script.js"></script>
+    <script src="match.js"></script>
+    <script src="leader.js"></script>
+    <script src="data.js"></script>
+    <script src="token.js"></script>
 </body>
 </html>

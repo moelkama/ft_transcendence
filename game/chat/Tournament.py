@@ -9,6 +9,7 @@ from . views import endpoint
 N = 4
 waiting = {}
 tournaments = {}
+tournament_name = 'tournament_' + datetime.now().time().strftime("%H_%M_%S_%f")
 
 async def full_tournament(users):
     # random.shuffle(users)
@@ -48,7 +49,6 @@ async def full_tournament(users):
     users.clear()
 
 async def run_game(match):
-    # if tournament[group_name].player1.avaible and tournament[group_name].player2.avaible:
     while match.players[0].avaible and match.players[1].avaible:
         match.move()
         await match.players[0].channel_layer.group_send(match.players[0].group_name, #await
@@ -111,6 +111,11 @@ class   Tournament(AsyncWebsocketConsumer):
             # waiting[self.user.login].send("you are already in another connection biiiiiitch")
         # waiting[self.user.login] = self
         waiting[str(x)] = self
+        await tournaments[tournament_name][group_name].players[0].channel_layer.group_send(tournament_name,
+        {
+            'type': 'send_data',
+            'data':json.dumps({'type':'tournament.info', 'players':[{'login':u.user.username, 'icon':u.user.photo_profile} for u in users]})
+        })
         if len(waiting) == N:
             x = 1
             asyncio.create_task(full_tournament(list(waiting.values())))

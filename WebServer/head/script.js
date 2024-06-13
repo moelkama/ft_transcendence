@@ -88,6 +88,7 @@ function already_logged() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    already_logged();
     fetch('/api/csrf-token/')
         .then(response => response.json())
         .then(data => {

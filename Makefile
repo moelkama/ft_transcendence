@@ -12,10 +12,10 @@ push :
 	git push 
 
 run :
-	docker-compose up
+	docker compose up
 
 build :
-	docker-compose up --build
+	docker compose up --build
 
 down:
 
