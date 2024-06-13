@@ -5,18 +5,50 @@ from django.shortcuts import redirect
 from django.http import HttpResponseBadRequest
 from urllib.parse import urlencode
 from rest_framework import generics, permissions
-from django.contrib.auth.models import User
-from .serializers import TaskSerializer
+from .serializers import TaskSerializer ,MatchSerializer
 import requests 
 import secrets
-from UserManagement.models import UserPro 
 import os
-
+from django.shortcuts import redirect
+from django.contrib.auth import authenticate
+from .forms import CustomUserForm 
+from .models import *
+from .forms import CustomUserForm
+from .models import CustomUser ,all_Match
+from rest_framework.authtoken.models import Token
+from django.http import JsonResponse
 
 state = secrets.token_urlsafe(16)
 client_id =  os.environ.get('client_id')
 redirect_uri = os.environ.get('redirect_uri')
 client_secret = os.environ.get('client_secret')
+
+def SignIn(request):
+    if request.user.is_authenticated:
+        return JsonResponse({'alert': 'ok', 'redirect_url': '/home/'}, status=200)
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user :
+            token ,_ = Token.objects.get_or_create(user=user)
+            request.session['user_id'] = user.id
+            request.session['token'] = token.key
+            return JsonResponse({'alert': 'ok', 'redirect_url': '/home/'}, status=200)
+        else:
+            return JsonResponse({'alert': 'Username or Password is incorrect'}, status=200)
+    return JsonResponse({'error': 'Invalid request method'}, status=200)
+
+def SignUp(request):
+    if request.method == "POST":
+        user_form = CustomUserForm(request.POST, request.FILES)
+        if user_form.is_valid():
+            user_form.save()
+            return JsonResponse({'status': True}, status=200)
+        else:
+            return JsonResponse({"status": False,"error": user_form.errors}, status=200)
+    return JsonResponse({'status': False}, status=200)
+
 
 def redirect_to_42(request):
     data = {
@@ -45,28 +77,32 @@ def exchange_code_for_token(code):
         return response_data['access_token']
     else:
         return None
- 
+
 def store_data_in_database(request,access_token):
     headers = {'Authorization': f'Bearer {access_token}'}
     response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
     if response.status_code == 200:
         user_data = response.json()
-        user, created = User.objects.get_or_create(username=user_data['login'], email=user_data['email'])
-        profile ,created = UserPro.objects.get_or_create(user=user)
+        """ checking if user already exists in database"""
+        login = user_data['login']
+        try:
+            user = CustomUser.objects.get(username=login)
+        except CustomUser.DoesNotExist:
+            user = None
+        if user:
+            if user.unigue_id != user_data['id']:
+                login = login + str(user_data['id'])
+
+        user, created = CustomUser.objects.get_or_create(username=login, email=user_data['email'])
         if  created:
             user.first_name = user_data['displayname'].split(' ')[0]
             user.last_name = user_data['displayname'].split(' ')[1]
+            user.unigue_id = user_data['id']
             user.save()
-            profile.first_name = user_data['displayname'].split(' ')[0]
-            profile.last_name = user_data['displayname'].split(' ')[1]
-            profile.username = user_data['login']
-            profile.save()
-        else :
-            profile.token_access = access_token
-            profile.save()
-        token ,created = Token.objects.get_or_create(user=user)
-        request.session['user_id'] = profile.id
+        token,_,= Token.objects.get_or_create(user=user)
+        request.session['user_id'] = user.id
         request.session['token'] = token.key
+
 
 def callback(request):
     code = request.GET.get('code')
@@ -82,20 +118,29 @@ def callback(request):
     
 
 class TaskListCreateAPIView(generics.ListCreateAPIView):
-    queryset = UserPro.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        return self.queryset.filter(id=self.request.user.id)
+
 
 class TaskRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = UserPro.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        return self.queryset.filter(id=self.request.user.id)
 
+class MatchListCreateAPIView(generics.ListCreateAPIView):
+    queryset = all_Match.objects.all()
+    serializer_class = MatchSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(id=self.request.user.id)
+    
 
 

@@ -14,6 +14,7 @@ urlpatterns = [
     path('logout/', include('auth_app.urls')),
     path('game/', include('auth_app.urls')),
     path('api/', include('auth_app.urls')),
-    path('account/', include('UserManagement.urls')),
+    path('account/', include('auth_app.urls')),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

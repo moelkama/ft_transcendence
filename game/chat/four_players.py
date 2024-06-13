@@ -15,13 +15,13 @@ class   Match_4_players(Match):
         super().__init__(n)
 
     def move(self):
-        if (self.b.x + self.b.r < 0):
+        if (self.b.x + self.b.r < ww):
             self.team2_score += 1
             # self.b.__init__(width / 2, height / 2, 1)
             self.b.x = width / 2
             self.b.y = height / 2
             # await asyncio.sleep(1)
-        if (self.b.x - self.b.r > width):
+        if (self.b.x - self.b.r > width - ww):
             self.team1_score += 1
             self.b.x = width / 2
             self.b.y = height / 2
@@ -86,6 +86,10 @@ async def four_players_game(users):
         if rooms[group_name].players[i].avaible:
             await rooms[group_name].players[i].send(json.dumps({'type':'game.end', 'result':result[int(i / 2)]}))
             rooms[group_name].players[i].avaible = False
+            await rooms[group_name].players[i].channel_layer.group_discard(
+                group_name,
+                rooms[group_name].players[i].channel_name,
+            )
             await rooms[group_name].players[i].close()
     del rooms[group_name]
 
@@ -96,14 +100,11 @@ class   four_players(AsyncWebsocketConsumer):
         print("--------------four_players---------------")
         await self.accept()
         self.avaible = True
-        # access_token = self.scope['query_string'].decode().split('=')[1]
-        # self.user = await sync_to_async(User.objects.get)(token_access=access_token)
         query_string = self.scope['query_string'].decode().split('=')[1]
         data = endpoint(query_string)
         self.user = User(data[0])
         # waiting[self.user.username] = self
         waiting[str(x)] = self
-        # self.index = x
         x += 1
         if len(waiting) == N:
             x = 0

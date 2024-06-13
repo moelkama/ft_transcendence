@@ -3,9 +3,8 @@ from datetime import datetime
 from . views import endpoint
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
-import requests
 # from auth_app.models import User
-
+import requests
 width = 600
 height = 300
 hh = 80
@@ -81,13 +80,13 @@ class   Match:
         self.players[index] = player
 
     def move(self):
-        if (self.b.x + self.b.r < 0):
+        if (self.b.x + self.b.r < ww):
             self.team1_score += 1
             self.b.x = width / 2
             self.b.y = height / 2
             # self.b.__init__(width / 2, height / 2)
             # await asyncio.sleep(1)
-        if (self.b.x - self.b.r > width):
+        if (self.b.x - self.b.r > width - ww):
             self.team2_score += 1
             self.b.x = width / 2
             self.b.y = height / 2
@@ -142,11 +141,42 @@ class   Match:
         self.team2_score = score_to_win
         return 2
 
+def save_Match(group_name, idx):
+    losee_token = rooms[group_name].players[abs(idx-1)].scope['query_string'].decode().split('=')[1]
+    headers = {'Authorization': f'Token {losee_token}'}
+    body = {
+        'lose': rooms[group_name].players[abs(idx-1)].user.lose + 1,
+    }
+    idloser = rooms[group_name].players[abs(idx-1)].user.id
+    url = f'http://auth:8000/api/tasks/{idloser}/'
+    requests.patch(url=url, headers=headers, data=body)
+
+    """ update winner score"""
+    win_token = rooms[group_name].players[idx].scope['query_string'].decode().split('=')[1]
+    headers = {'Authorization': f'Token {win_token}'}
+    body = {
+        'score': rooms[group_name].players[idx].user.score + 10,
+        'win': rooms[group_name].players[idx].user.win + 1,
+    }
+    idwinner = rooms[group_name].players[idx].user.id
+    url = f'http://auth:8000/api/tasks/{idwinner}/'
+    requests.patch(url=url, headers=headers, data=body)
+
+    """ save match to database"""
+    data = {
+        'winner': idwinner,
+        'loser': idloser,
+        'score1': rooms[group_name].team1_score if rooms[group_name].team1_score > rooms[group_name].team2_score else rooms[group_name].team2_score,
+        'score2': rooms[group_name].team1_score if rooms[group_name].team1_score < rooms[group_name].team2_score else rooms[group_name].team2_score,}
+    url = f'http://auth:8000/api/match/'
+    requests.post(url=url, headers=headers, data=data)
+
 async def start_game(group_name):
-    print("----------start_game_________")
     winner = await rooms[group_name].run_game()
     result = ['Winner', 'Winner']
+    idx = 0
     if winner == 1:
+        idx = 1
         result[0] = 'Loser'
     else:
         result[1] = 'Loser'
@@ -155,6 +185,7 @@ async def start_game(group_name):
             await rooms[group_name].players[i].send(json.dumps({'type':'game.end', 'result':result[i % 2]}))
             rooms[group_name].players[i].avaible = False
             await rooms[group_name].players[i].close()
+    save_Match(group_name, idx)
     del rooms[group_name]
 
 def serialize_Match(o):
@@ -176,12 +207,12 @@ class   User:
 
 class RacetCunsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("___________________connect___________________")
+        print("----------------connect----------------")
         global group_name
         await self.accept()
         self.avaible = True
         query_string = self.scope['query_string'].decode().split('=')[1]
-        data = endpoint(query_string)
+        data = endpoint(query_string)        
         self.user = User(data[0])
         self.group_name = group_name
         await self.channel_layer.group_add(self.group_name, self.channel_name)
@@ -191,6 +222,8 @@ class RacetCunsumer(AsyncWebsocketConsumer):
                 group_name = 'Match_' + datetime.now().time().strftime("%H_%M_%S_%f")
                 rooms[self.group_name].set_player(self, 1)
                 asyncio.create_task(start_game(self.group_name))
+            else:
+                await self.close()
         else:
             self.racket = racket(0, (height - hh) / 2, 0, height)
             rooms[self.group_name] = Match(2)

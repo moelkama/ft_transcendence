@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
     <script src="game.js"></script>
     <link rel="icon" href="icon.ico" type="image/x-icon">
 </head>
@@ -13,13 +14,13 @@
     <div class="ball2"></div>
     <nav class="navbar">
         <div class="navbar-logo">
-            <a class="nav-link" onclick="active_section('play')"><img src="./resrc/media/logo.png" alt="Logo"></a>
+            <a class="nav-link"><img src="./resrc/media/logo.png" onclick="active_section('play')" alt="Logo"></a>
         </div>
         <div class="navbar-buttons">
             <ul>
                 <li><a class="nav-link" data-target="home" href="#home" onclick="disactiv_sections()">Home</a></li>
                 <li><a class="nav-link" data-target="profile" href="#profile" onclick="disactiv_sections()">Profile</a></li>
-                <li><div class="profil"><img id="pro" src="" alt=""></div></li>
+                <li><div class="profil" id="imageprofile"></div></li>
             </ul>
         </div>
     </nav>
@@ -28,9 +29,9 @@
             <div class="aside_content">
                 <div class="image1">
                     <ul>
-                        <li><a class="settings-button" onclick="showSettingsModal()"><div class="seting_icon"></div></a></li>
-                        <li><a class="notification" onclick="showNotificationsModal()"><div class="notification_icon aside_button"></div></a></li>
-                        <li><a class="nav-link" data-target="chat" href=""><div class="chat_icon  aside_button"></div></a></li>
+                        <!-- <li><a class="settings-button" onclick="showSettingsModal()"><div class="seting_icon"></div></a></li> -->
+                        <li><a class="notification" onclick="showNotificationsModal()"><div    class="notification_icon aside_button"></div></a></li>
+                        <li><a class="nav-link" data-target="chat" href=""><div    class="chat_icon  aside_button"></div></a></li>
                     </ul>
                 </div>
                 <div class="image2">
@@ -41,15 +42,14 @@
                 </div>
             </div>
         </aside>
-        
         <article>
             <div id="home" class="content-section home">
                 <div class="game">
                     <img src="./resrc/normal.jpeg" alt="">
-                    <button onclick="navigate('play')">Start game</button>
+                    <button onclick="navigate('play')" >Start game</button>
                 </div>
                 <div class="game">
-                    <img src="./resrc/champions.png" alt="">
+                    <img src="./resrc/ai_game.jpeg" alt="">
                     <button onclick="navigate('play_tournament')">Play Tournament</button>
                 </div>
                 <div class="challenge">
@@ -74,7 +74,7 @@
                     </div>
                     <div>
                         <div class="rank"></div>
-                        <h3 id="content_rank">1</h3>
+                        <h3 id="content_rank"></h3>
                     </div>
                     <div class="scor">
                         <div><h1>scor</h1></div>
@@ -82,8 +82,13 @@
                     </div>
                 </div>
                 <div class="data">
-                    <div class="leadrboard">
-                        <div class="data_titel"><h2>leadrboard</h2></div>
+                    <div class="leadrboard" id="leadrboard">
+                        <!-- <div class="data_titel"><h2>leadrboard</h2></div>
+                        <p id="userone"> <img id="image1"src="" > </p>
+                        <p id="usertwo"> <img id="image2"src="" ></p>
+                        <p id="userthree"><img id="image3"src="" ></p>
+                        <p id="userfour"><img id="image4"src="" ></p>
+                        <p id="userfive"><img id="image5"src="" ></p> -->
                     </div>
                     <div class="global_data">
                         <div class="data_titel">
@@ -91,8 +96,11 @@
                             <a href="#"><h2>match history</h2></a>
                             <a href="#"><h2>channels</h2></a>
                         </div>
+                        <h1 id="totalid"></h1>
+                        <h1 id="loseid"></h1>
+                        <h1 id="winid"></h1>
                     </div>
-                    <div class="achievements">
+                    <div class="achievements" id="achievements">
                         <div class="data_titel"><h2>achievements</h2></div>
                     </div>
                 </div>
@@ -144,26 +152,25 @@
                     </div>
                     <div>
                         <h2>Edit Profile</h2>
-                        
-                        <div class="settings-form">
-                            <img id="editimage" src="" alt="profile">
-                                <label for="profileImage">new Profile Image</label>
-                                <!-- <img id="profileImagePreview" src="default-profile.png" alt="Profile Image" class="profile-image"> -->
-                                <input type="file" id="profileImage" accept="image/*" onchange="previewImage(event)">
-                                <label id="nameprofile" for="username"></label>
-                                <input type="text" id="username" placeholder="Enter new username">
-                            <button class="save-button" onclick="saveSettings()">Save Changes</button>
+                        <div class="settings-form" id="settings-form">
+                            <!-- <img id="editimage" src="" alt="profile"> -->
+                            <!-- <label for="profileImage">new Profile Image</label> -->
+                            <!-- <img id="profileImagePreview" src="default-profile.png" alt="Profile Image" class="profile-image"> -->
+                            <!-- <input type="file" id="profileImage" accept="image/*" onchange="previewImage(event)">
+                                < -->
+                            <label id="nameprofile" for="username"></label>
+                            <form id="avatarForm" class="form-container" method="post" enctype="multipart/form-data" action="/update_profile/">
+                                <input type="hidden" name="csrfmiddlewaretoken" id="csrfToken">
+                                <input type="file" id="image" name="image" accept="image/*" required>
+                                <input type="text" id="username" name="username" placeholder="Username" required>
+                                <button type="submit">Upload</button>
+                                <div id="messages"></div>
+                            </form>
+                            <!-- <button class="save-button" onclick="saveSettings()">Save Changes</button> -->
+                        </div>
                     </div>
                 </div>
-                </div>
             </div>
-            <section id="menu-section-id">
-                    <div id="menu-id" class="menu">
-                        <button id="play-id" class="menu-btn" onclick="navigate('play')">Play</button>
-                        <button id="play-tournament-id" class="menu-btn" onclick="navigate('play_tournament')">tournament</button>
-                        <button id="play-four_players-id" class="menu-btn" onclick="navigate('ping-pong-4')">four players</button>
-                </div>
-            </section> 
             <section id="loading-section-id">
                 <div id="loading">
                     <div id="loader"></div>
@@ -189,10 +196,15 @@
                 <span id="resultMessage">You Win</span>
                 <img id="result-gif" src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/e70bcc65284623.5aef51b58b0c9.gif">
             </section>
-            <!-- <section id="play-4" >
+            <section id="resultModal">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <span id="resultMessage">You Win</span>
+                <img id="result-gif" src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/e70bcc65284623.5aef51b58b0c9.gif">
+            </section>
+            <section id="play-4" >
                 <div class="ping-pong">
-                    <div class="users">
-                        <div class="user1">
+                <div class="users">
+                    <div class="user1">
                         <img id="4-canvas-icon-id-0" class="icon">
                         <h2 id="4-canvas-display_name-id-0" class="display-name"></h2>
                     </div>
@@ -213,7 +225,7 @@
                     </div>
                 </div>
             </div>
-            </section>-->
+            </section>
             <section id="play_tournament">
                 <div id="tournament-id" class="tournament">
                     <div class="round">
@@ -261,6 +273,44 @@
             <img id="win-tournament-background-id" src="https://cdn.dribbble.com/users/7421625/screenshots/18722898/media/9dc2ccd128c89b19dddd55447ba5e1d0.gif">
         </section> -->
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function get_csrf_token() {
+                fetch('/api/csrf-token/')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('csrfToken').value = data.csrfToken;
+                })
+                .catch(error => console.error('Error fetching CSRF token:', error));
+            }
+            get_csrf_token();
+            document.getElementById('avatarForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+                const csrfToken = document.getElementById('csrfToken').value;
+                fetch('/update_profile/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === true) {
+                            window.location.href = "/home/";
+                    } else {
+                        document.getElementById('messages').innerHTML =  data.message;
+                        document.getElementById('messages').style.color = 'red';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('messages').innerHTML = error;
+                    document.getElementById('messages').style.color = 'red';
+                });
+            });
+        });
+    </script>
 </body>
 </html>

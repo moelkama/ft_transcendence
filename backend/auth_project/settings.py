@@ -24,8 +24,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'UserManagement',
+    # 'UserManagement',
 ]
+AUTH_USER_MODEL = 'auth_app.CustomUser'
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 

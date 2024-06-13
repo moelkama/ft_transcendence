@@ -1,14 +1,13 @@
 from rest_framework import serializers
 
-from UserManagement.models import UserPro 
-from django.contrib.auth.models import User
+from .models import CustomUser ,all_Match
+
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserPro
-        fields = '__all__'
-
-class UserSerializer(serializers.ModelSerializer):
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'photo_profile', 'score', 'win', 'lose', 'ranking', 'total_match']
+class MatchSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = '__all__'
+        model = all_Match
+        fields = ['winner', 'loser', 'date','score1','score2']

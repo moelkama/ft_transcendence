@@ -8,7 +8,7 @@ def endpoint(token):
     url = f'http://auth:8000/tasks/'
     response = requests.get(url, headers=headers)
     data = None
-
+    print(response.status_code, "-----------------response.status_code------------------")
     if response.status_code == 200:
         data = response.json()
         for task in data:

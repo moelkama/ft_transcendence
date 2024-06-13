@@ -6,19 +6,12 @@ var ctx = NaN;
 var width = NaN;
 var height = NaN;
 
-// window.onload = function() {
-//     elem = document.getElementById("4-canvas-id")
-//     ctx = elem.getContext("2d");
-//     width = elem.width
-//     height = elem.height
-// };
-
 function draw_ball(b)
 {
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
     ctx.stroke();
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = "white";
     ctx.fill();
 }
 
@@ -38,7 +31,7 @@ function put_score(score, x, y)
 
 function draw_racket(racket)
 {
-    ctx.fillStyle = "red";
+    ctx.fillStyle = "white";
     ctx.fillRect(racket.x, racket.y, racket.w, racket.h);
 }
 
@@ -65,20 +58,18 @@ function    disactiv_sections()
 function    active_section(section_id)
 {
     disactiv_sections();
-    document.getElementById(section_id).classList.add('active');
+    // if (section_id == 'play')
+    //     elem.classList.add('active');
+    // else
+        document.getElementById(section_id).classList.add('active');
 }
 
 function    display_ping_pong(data, section_id)
 {
     if (firs_time)
     {
-        console.log("hellooooo", section_id);
         for (let i = 0; i < data.players.length; i++)
         {
-            console.log(data.players[i].user.login);
-            console.log(data.players[i].user.icon);
-
-            console.log(data.players.length.toString() + "-canvas-display_name-id-" + i.toString());
             document.getElementById(data.players.length.toString() + "-canvas-display_name-id-" + i.toString()).innerHTML = data.players[i].user.login;
             document.getElementById(data.players.length.toString() + "-canvas-icon-id-" + i.toString()).src = "https://127.0.0.1/" + data.players[i].user.icon;
         }
@@ -215,83 +206,3 @@ function navigate(section_id) {
     else
         active_section(section_id);
 }
-
-// document.onload = getSessionData();
-// function getSessionData() {
-//     fetch('/api/data/')
-//         .then(response => {
-//             if (!response.ok) {
-//                 window.location.href = "/";
-//             }
-//             return response.json();
-//         })
-//         .then(data => {
-//             const userData = JSON.parse(JSON.stringify(data));
-//             document.getElementById('login').textContent =  userData.username;
-//             document.getElementById('pro').src = userData.photo_profile;
-//             // console.log(userData);
-//         })
-// }
-
-// Call fetchData using async/await
-// var data = NaN
-
-// main();
-// url = `wss://${window.location.host}/wss/game/?id=${data.user_id}&token=${data.token}`;
-// main_socket = new WebSocket(url);
-// main_socket.onopen = function(event) {
-//     console.log("WebSocket connection established.");
-// };
-// console.log(data);
-// fetch('/api/get_session/')
-//     .then(response => {
-//         if (!response.ok) {
-//             window.location.href = "/login/";
-//         }
-//         return response.json();
-//     })
-//     .then(data =>
-//     {
-//         url = `wss://${window.location.host}/wss/game/?id=${data.user_id}&token=${data.token}`;
-//         main_socket = new WebSocket(url);
-
-//         elem = document.getElementById("canvas-id")
-//         ctx = elem.getContext("2d");
-//         width = elem.width
-//         height = elem.height
-
-//         const menuButton = document.getElementById('ShowMenu-id');
-//         console.log(menuButton);
-//         const menu = document.getElementById('menu-id');
-
-//         menuButton.addEventListener('click', function() {
-//             menu.classList.toggle('show');
-//         });
-
-//         document.getElementById("play-id").addEventListener('click', play);
-
-//         main_socket.onopen = function(event) {
-//             console.log("WebSocket connection established.");
-//         };
-
-//         main_socket.onmessage = function (e)
-//         {
-//             var data = JSON.parse(e.data)
-//             console.log(data);
-//             if (data.type == 'game.state')
-//             {
-//                 display_ping_pong(data);
-//                 draw(data);
-//             }
-//             else if (data.type == 'game.end')
-//             {
-//                 console.log("game  end");
-//             }
-//         }
-//     }
-// );
-
-// function    play()
-// {
-//     console.log("hwllfwejifjwe")
-// }

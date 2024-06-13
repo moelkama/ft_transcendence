@@ -6,7 +6,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from . views import endpoint
 
-N = 8
+N = 4
 waiting = {}
 tournaments = {}
 
@@ -32,11 +32,11 @@ async def full_tournament(users):
                 tournaments[tournament_name][users[i].group_name].set_player(users[i], 1)
         await tournaments[tournament_name][group_name].players[0].channel_layer.group_send(tournament_name,
         {
-            'type': 'send_info',
-            'info':json.dumps({'type':'tournament.info', 'players':[{'login':u.user.username, 'icon':u.user.photo_profile} for u in users]})
+            'type': 'send_data',
+            'data':json.dumps({'type':'tournament.info', 'players':[{'login':u.user.username, 'icon':u.user.photo_profile} for u in users]})
         })
         users.clear()
-        await asyncio.sleep(5)
+        await asyncio.sleep(3)
         tasks = [asyncio.create_task(run_game(m)) for m in tournaments[tournament_name].values()]
         users = await asyncio.gather(*tasks)
         tasks.clear()
@@ -53,8 +53,8 @@ async def run_game(match):
         match.move()
         await match.players[0].channel_layer.group_send(match.players[0].group_name, #await
         {
-            'type': 'send_state',
-            'pingpong':json.dumps(match, default=serialize_Match)
+            'type': 'send_data',
+            'data':json.dumps(match, default=serialize_Match)
         })
         await asyncio.sleep(0.001)
         if (match.team2_score == score_to_win):
@@ -101,8 +101,6 @@ class   Tournament(AsyncWebsocketConsumer):
         self.tournament_name = "None"
         self.group_name = "None"
         self.avaible = True
-        # access_token = self.scope['query_string'].decode().split('=')[1]
-        # self.user = await sync_to_async(User.objects.get)(token_access=access_token)
         query_string = self.scope['query_string'].decode().split('=')[1]
         data = endpoint(query_string)
         self.user = User(data[0])
@@ -122,14 +120,9 @@ class   Tournament(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         self.racket.change_direction(data)
 
-    async def send_info(self, event):
-        print("--------send_info-----------")
+    async def send_data(self, event):
         if self.avaible:
-            await self.send(event['info'])
-
-    async def send_state(self, event):
-        if self.avaible:
-            await self.send(event['pingpong'])
+            await self.send(event['data'])
 
     async def disconnect(self, code):
         if self.user.username in waiting:
