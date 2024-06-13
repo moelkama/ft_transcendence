@@ -68,6 +68,36 @@ class ball:
             'r':self.r,
         }
 
+def save_Match(group_name, idx):
+    losee_token = rooms[group_name].players[abs(idx-1)].scope['query_string'].decode().split('=')[1]
+    headers = {'Authorization': f'Token {losee_token}'}
+    body = {
+        'lose': rooms[group_name].players[abs(idx-1)].user.lose + 1,
+    }
+    idloser = rooms[group_name].players[abs(idx-1)].user.id
+    url = f'http://auth:8000/api/tasks/{idloser}/'
+    requests.patch(url=url, headers=headers, data=body)
+
+    """ update winner score"""
+    win_token = rooms[group_name].players[idx].scope['query_string'].decode().split('=')[1]
+    headers = {'Authorization': f'Token {win_token}'}
+    body = {
+        'score': rooms[group_name].players[idx].user.score + 10,
+        'win': rooms[group_name].players[idx].user.win + 1,
+    }
+    idwinner = rooms[group_name].players[idx].user.id
+    url = f'http://auth:8000/api/tasks/{idwinner}/'
+    requests.patch(url=url, headers=headers, data=body)
+
+    """ save match to database"""
+    data = {
+        'winner': idwinner,
+        'loser': idloser,
+        'score1': rooms[group_name].team1_score if rooms[group_name].team1_score > rooms[group_name].team2_score else rooms[group_name].team2_score,
+        'score2': rooms[group_name].team1_score if rooms[group_name].team1_score < rooms[group_name].team2_score else rooms[group_name].team2_score,}
+    url = f'http://auth:8000/api/match/'
+    requests.post(url=url, headers=headers, data=data)
+
 class   Match:
     def __init__(self, N):
         self.players = [None] * N
@@ -137,42 +167,13 @@ class   Match:
                 return 2
         if self.players[0].avaible:
             self.team1_score = score_to_win
-            return 1
+            return 2
         self.team2_score = score_to_win
-        return 2
-
-def save_Match(group_name, idx):
-    losee_token = rooms[group_name].players[abs(idx-1)].scope['query_string'].decode().split('=')[1]
-    headers = {'Authorization': f'Token {losee_token}'}
-    body = {
-        'lose': rooms[group_name].players[abs(idx-1)].user.lose + 1,
-    }
-    idloser = rooms[group_name].players[abs(idx-1)].user.id
-    url = f'http://auth:8000/api/tasks/{idloser}/'
-    requests.patch(url=url, headers=headers, data=body)
-
-    """ update winner score"""
-    win_token = rooms[group_name].players[idx].scope['query_string'].decode().split('=')[1]
-    headers = {'Authorization': f'Token {win_token}'}
-    body = {
-        'score': rooms[group_name].players[idx].user.score + 10,
-        'win': rooms[group_name].players[idx].user.win + 1,
-    }
-    idwinner = rooms[group_name].players[idx].user.id
-    url = f'http://auth:8000/api/tasks/{idwinner}/'
-    requests.patch(url=url, headers=headers, data=body)
-
-    """ save match to database"""
-    data = {
-        'winner': idwinner,
-        'loser': idloser,
-        'score1': rooms[group_name].team1_score if rooms[group_name].team1_score > rooms[group_name].team2_score else rooms[group_name].team2_score,
-        'score2': rooms[group_name].team1_score if rooms[group_name].team1_score < rooms[group_name].team2_score else rooms[group_name].team2_score,}
-    url = f'http://auth:8000/api/match/'
-    requests.post(url=url, headers=headers, data=data)
+        return 1
 
 async def start_game(group_name):
     winner = await rooms[group_name].run_game()
+    print("------------>", rooms[group_name].team2_score, rooms[group_name].team1_score)
     result = ['Winner', 'Winner']
     idx = 0
     if winner == 1:
@@ -181,7 +182,7 @@ async def start_game(group_name):
     else:
         result[1] = 'Loser'
     for i in range(2):
-        if rooms[group_name].players[i].avaible:
+        if rooms[group_name] and rooms[group_name].players[i].avaible:
             await rooms[group_name].players[i].send(json.dumps({'type':'game.end', 'result':result[i % 2]}))
             rooms[group_name].players[i].avaible = False
             await rooms[group_name].players[i].close()
@@ -241,10 +242,10 @@ class RacetCunsumer(AsyncWebsocketConsumer):
     async def disconnect(self, event):
         print("----------disconnect-----------")
         self.avaible = False
-        if (self.group_name in rooms):
-            del rooms[self.group_name]
-        await self.channel_layer.group_send(self.group_name,
-        {
-            'type': 'send_data',
-            'data': json.dumps({'type':'game.end', 'result':'Winner'})
-        })
+        # if (self.group_name in rooms):
+        #     del rooms[self.group_name]
+        # await self.channel_layer.group_send(self.group_name,
+        # {
+        #     'type': 'send_data',
+        #     'data': json.dumps({'type':'game.end', 'result':'Winner'})
+        # })
