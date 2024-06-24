@@ -8,9 +8,9 @@ import requests
 width = 600
 height = 300
 hh = 80
-ww = 10
+ww = 5
 racket_speed = 1
-score_to_win = 2
+score_to_win = 20
 
 class racket:
     def __init__(self, x, y, min, max):
@@ -58,7 +58,7 @@ class ball:
         self.y = y
         self.r = 10
         self.angl = 0
-        self.speed = 0.6
+        self.speed = 0.9
         self.vx = math.cos(self.angl * math.pi / 180) * self.speed
         self.vy = math.sin(self.angl * math.pi / 180) * self.speed
     def serialize_ball(self):
@@ -155,11 +155,12 @@ class   Match:
     async def run_game(self):
         while self.players[0].avaible and self.players[1].avaible:
             self.move()
-            await self.players[0].channel_layer.group_send(self.players[0].group_name,
-            {
-                'type': 'send_data',
-                'data':json.dumps(self, default=serialize_Match)
-            })
+            await send_to_group(self.players, {'data':json.dumps(self, default=serialize_Match)})
+            # await self.players[0].channel_layer.group_send(self.players[0].group_name,
+            # {
+            #     'type': 'send_data',
+            #     'data':json.dumps(self, default=serialize_Match)
+            # })
             await asyncio.sleep(0.001)
             if (self.team1_score == score_to_win):
                 return 1
@@ -171,9 +172,21 @@ class   Match:
         self.team2_score = score_to_win
         return 1
 
+async def send_to_group(group, data):
+    for channel in group:
+        await channel.send_data(data)
+        # await asyncio.sleep(0.001)
+
+def serialize_Users(o):
+    return{
+        'type': 'game.info',
+        'players':[p.user.serialize_User() for p in o.players],
+    }
+
 async def start_game(group_name):
+    await send_to_group(rooms[group_name].players, {'data':json.dumps(rooms[group_name], default=serialize_Users)})
+    await asyncio.sleep(4)
     winner = await rooms[group_name].run_game()
-    print("------------>", rooms[group_name].team2_score, rooms[group_name].team1_score)
     result = ['Winner', 'Winner']
     idx = 0
     if winner == 1:
@@ -192,7 +205,7 @@ async def start_game(group_name):
 def serialize_Match(o):
     return{
         'type':'game.state',
-        'players':[{'user': {'login':p.user.username, 'icon':p.user.photo_profile}, 'racket':p.racket.serialize_racket()} for p in o.players],
+        'players':[{'racket':p.racket.serialize_racket()} for p in o.players],
         'ping':o.b.serialize_ball(),
         'team1_score':o.team1_score,
         'team2_score':o.team2_score,
@@ -205,6 +218,12 @@ class   User:
     def __init__(self, dict):
         for key, value in dict.items():
             setattr(self, key, value)
+
+    def serialize_User(self):
+        return{
+            'login':self.username,
+            'icon':self.photo_profile,
+        }
 
 class RacetCunsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -237,6 +256,7 @@ class RacetCunsumer(AsyncWebsocketConsumer):
 
     async def send_data(self, event):
         if self.avaible:
+            # print("event::::::::::::::::::::::", event)
             await self.send(event['data'])
 
     async def disconnect(self, event):

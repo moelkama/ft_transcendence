@@ -48,7 +48,7 @@
                 </div>
                 <div class="game">
                     <img src="./resrc/ai_game.jpeg" alt="">
-                    <button onclick="navigate('play_tournament')">play Tournament</button>
+                    <button onclick="navigate('tournament_input')">play Tournament</button>
                 </div>
                 <div class="challenge">
                     <div class="center">
@@ -82,15 +82,12 @@
                     <div class="leadrboard" id="leadrboard">
                         <div class="data_titel"><h2>leadrboard</h2></div>
                     </div>
-                    
                     <div class="global_data" id="history">
                         <div class="data_titel" ><h2>match history</h2></div>
                     </div>
-                    
                     <div class="achievements" id="achievements">
                         <div class="data_titel"><h2>achievements</h2></div>
                     </div>
-                    
                 </div>
             </div>
             <div id="chat" class="content-section aside-co">
@@ -213,6 +210,10 @@
                 </div>
             </div>
         </section>
+        <section id="tournament_input">
+            <input type="text" id="myInput">
+            <button onclick="navigate('play_tournament')">Start</button>
+        </section>
         <section id="play_tournament">
             <div id="tournament-id" class="tournament">
                 <div class="round">
@@ -255,20 +256,35 @@
                 </div>
             </section>
             <section id="win-tournament-id">
-                <img id="win-tournament-background-id" src="https://cdn.dribbble.com/users/7421625/screenshots/18722898/media/9dc2ccd128c89b19dddd55447ba5e1d0.gif">
+                <img id="win-tournament-background-id" src="./resrc/win_tournament.gif">
             </section>
-            <section id="tournament_list" class="student-list">
-                <div class="student">
-                    <img src="mkatfi.jpeg" alt="Student Icon" class="student-icon">
-                    <span class="student-name">Student Name 1</span>
-                </div>
-                <div class="student">
-                    <img src="mkatfi.jpeg" alt="Student Icon" class="student-icon">
-                    <span class="student-name">Student Name 2</span>
-                </div>
-                <div class="student">
-                    <img src="mkatfi.jpeg" alt="Student Icon" class="student-icon">
-                    <span class="student-name">Student Name 3</span>
+            <!-- <div calss="glo">
+                <div class="square">
+                    </div>
+                </div> -->
+            <!-- </div> -->
+            <section id="tournament_list">
+                <div class="outer">
+                    <div class="middle square">
+                        <div id="tournament_content" class="inner">
+                            <!-- <div class="student">
+                                <img src="https://cdn.intra.42.fr/users/3e7d3dd26c2be1f602ed1d631b17bdbb/mkatfi.JPG" alt="Student Icon" class="student-icon">
+                                <span class="student-name">Student Name 1</span>
+                            </div>
+                            <div class="student">
+                                <img src="https://cdn.intra.42.fr/users/3e7d3dd26c2be1f602ed1d631b17bdbb/mkatfi.JPG" alt="Student Icon" class="student-icon">
+                                <span class="student-name">Student Name 2</span>
+                            </div>
+                            <div class="student">
+                                <img src="https://cdn.intra.42.fr/users/3e7d3dd26c2be1f602ed1d631b17bdbb/mkatfi.JPG" alt="Student Icon" class="student-icon">
+                                <span class="student-name">Student Name 3</span>
+                            </div>
+                            <div class="student">
+                                <img src="https://cdn.intra.42.fr/users/3e7d3dd26c2be1f602ed1d631b17bdbb/mkatfi.JPG" alt="Student Icon" class="student-icon">
+                                <span class="student-name">Student Name 3</span>
+                            </div> -->
+                        </div>
+                    </div>
                 </div>
             </section>
         </article>

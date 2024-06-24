@@ -935,7 +935,7 @@ html {
     background-color: #f0f0f0;
 }
 
-.menu {
+/* .menu {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -968,7 +968,7 @@ html {
 
 .menu-btn:hover {
     background-color: #45a049;
-}
+} */
 
 #resultModal {
     background-color: #1d1e21;
@@ -1032,6 +1032,10 @@ section.active {
     width: 100%;
 }
 
+/* .glo{
+  background-color: white;
+} */
+
 .student-list {
   max-width: 220px;
   margin: 20px auto;
@@ -1064,4 +1068,94 @@ section.active {
   font-family: Arial, sans-serif;
   font-size: 18px;
   color: #333;
+}
+/* 
+.square{
+  background-color: yellow;
+
+} */
+
+/*iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii*/
+#tournament_list{
+    position: absolute;
+    top: 50%;
+    left: 30%;
+    width: 300px;
+    height: auto;
+    /* transform: translate(-50%, -50%); */
+}
+
+.outer {
+	display: flex;
+	justify-content: center;
+  align-items: center;
+  /* height: 100vh; */
+  margin: 0;
+  width: auto;
+  height: auto;
+  /* background-color: #f0f0f0; */
+  /* top: 50%; */
+  /* left: 50%; */
+  /* transform: translate(-50%, -50%); */
+}
+
+.middle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.inner {
+  bottom: 0;
+  max-width: 220px;
+  margin: 20px auto;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.square {
+  /* position: relative; */
+  /* width: 100px;
+  height: 100px; */
+  /* background-color: #3498db; */
+}
+
+.square::before, .square::after {
+  content: '';
+  position: absolute;
+  /* top: -20px; */
+  /* left: -20px; */
+  width: inherit;
+  height: inherit;
+  animation: fire 3s infinite linear;
+}
+
+.square::before {
+  background: rgba(102, 83, 159, 0.6);
+  filter: blur(35px);
+}
+
+.square::after {
+  background: rgba(102, 83, 159, 0.6);
+  filter: blur(35px);
+}
+
+@keyframes fire {
+  	0% {
+      	transform: scale(1);
+    	opacity: 10;
+  	}
+  	50% {
+      	transform: scale(0);
+		opacity: 0;
+	}
+  	100% {
+    	transform: scale(1);
+    	opacity: 10;
+  	}
 }
