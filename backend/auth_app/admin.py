@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import CustomUser, all_Match
+from .models import CustomUser, all_Match ,Friends ,FriendRequest
 
 # admin.site.register(UserProfile)
 
@@ -21,3 +21,5 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(all_Match)
+admin.site.register(Friends)
+admin.site.register(FriendRequest)

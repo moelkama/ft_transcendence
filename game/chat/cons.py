@@ -175,7 +175,6 @@ class   Match:
 async def send_to_group(group, data):
     for channel in group:
         await channel.send_data(data)
-        # await asyncio.sleep(0.001)
 
 def serialize_Users(o):
     return{
@@ -256,7 +255,6 @@ class RacetCunsumer(AsyncWebsocketConsumer):
 
     async def send_data(self, event):
         if self.avaible:
-            # print("event::::::::::::::::::::::", event)
             await self.send(event['data'])
 
     async def disconnect(self, event):

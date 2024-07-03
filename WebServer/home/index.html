@@ -12,7 +12,7 @@
     <div class="ball2"></div>
     <nav class="navbar">
         <div class="navbar-logo">
-            <a class="nav-link"><img src="./resrc/media/logo.png" alt="Logo" onclick="active_section('play')"></a>
+            <a class="nav-link" data-target="home"><img src="./resrc/media/logo.png" alt="Logo" onclick="active_section('play')"></a>
         </div>
         <div class="navbar-buttons">
             <ul>
@@ -50,17 +50,21 @@
                     <img src="./resrc/ai_game.jpeg" alt="">
                     <button onclick="navigate('tournament_input')">play Tournament</button>
                 </div>
+                <div class="game">
+                    <img src="./resrc/ai_game.jpeg" alt="">
+                    <button onclick="navigate('ping-pong-4')">Play 4players ping-pong</button>
+                </div>
                 <div class="challenge">
                     <div class="center">
-                        <h2>challenge friends</h2>
+                        <h2>Online Friends</h2>
                     </div>
-                    <div class="list_friend"></div>
+                    <div class="list_friend" id="challenge_friend"></div>
                 </div>
                 <div class="invite">
                     <div class="center">
-                        <h2>invite to friends</h2>
+                        <h2>Suggest Friends</h2>
                     </div>
-                    <div class="list_friend"></div>
+                    <div class="list_friend" id="list_friend"></div>
                 </div>
             </div>
             <div id="profile" class="content-section profile">
@@ -81,23 +85,32 @@
                 <div class="data">
                     <div class="leadrboard" id="leadrboard">
                         <div class="data_titel"><h2>leadrboard</h2></div>
+                        <div class="leadrboard_container"  id="leadrboard_container"></div>
                     </div>
+                    
                     <div class="global_data" id="history">
                         <div class="data_titel" ><h2>match history</h2></div>
+                        <div class="data_history" id="data_history"></div>
                     </div>
+                    
                     <div class="achievements" id="achievements">
-                        <div class="data_titel"><h2>achievements</h2></div>
+                        <div class="data_titel"><h2>Friends</h2></div>
+                        <div class="Friends"  id="Friends"></div>
+
                     </div>
+                    
                 </div>
             </div>
             <div id="chat" class="content-section aside-co">
                 <div class="friend-list">
                     <h2>Friends</h2>
                     <ul id="friends">
-                        <li onclick="openChat('Alice')">Alice</li>
+                        <div class="list_friend" id="list_friend_chat"></div>
+                        <!-- <li onclick="openChat('Alice')">Alice</li>
                         <li onclick="openChat('Bob')">Bob</li>
-                        <li onclick="openChat('Charlie')">Charlie</li>
+                        <li onclick="openChat('Charlie')">Charlie</li> -->
                     </ul>
+
                 </div>
                 <div class="chat-container">
                     <div id="chat-header" class="chat-header">
@@ -112,11 +125,17 @@
                     </div>
                 </div>
             </div>
-            <div id="notifi" class="content-section">
-                <div class="notification-contiener">
-                    <!-- <span class="close" onclick="closeNotificationsModal()">&times;</span> -->
-                    <div class="modal-content">
-                        <span class="close" onclick="closeNotificationsModal()">&times;</span>
+            <div id="notifi">
+                <div class="notification-contiener" id="notify">
+                    <div class="modal_notificaton">
+                        <div class="close_notificaton">
+                        <span  onclick="closeNotificationsModal()">&times;</span>
+                     </div>
+                        <h1>Notifications</h1>
+                        
+                </div>
+                    <div class="content_notify" id="content_notify">
+
                     </div>
                 </div>
             </div>
@@ -177,13 +196,8 @@
             </section>
             <section id="resultModal">
                 <span class="close" onclick="closeModal()">&times;</span>
-                <span id="resultMessage">You Win</span>
-                <img id="result-gif" src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/e70bcc65284623.5aef51b58b0c9.gif">
-            </section>
-            <section id="resultModal">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <span id="resultMessage">You Win</span>
-                <img id="result-gif" src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/e70bcc65284623.5aef51b58b0c9.gif">
+                <span id="resultMessage"></span>
+                <img id="result-gif">
             </section>
             <section id="play-4" >
                 <div class="ping-pong">
@@ -210,9 +224,13 @@
                 </div>
             </div>
         </section>
-        <section id="tournament_input">
-            <input type="text" id="myInput">
-            <button onclick="navigate('play_tournament')">Start</button>
+        <section id="tournament_input" class="tournament-input">
+            <form method="post" id="display_name-form-id" class="tournament-input-form" action="/account/display_name/" enctype="multipart/form-data">
+                <input type="hidden" name="csrfmiddlewaretoken" id="display_name_csrfToken">
+                <input type="text" id="display_name" class="inputt" name="display_name" placeholder="Tournament display name" required><br>
+                <div id="display_name_err"></div>
+                <button type="submit" class="buttonn">Start</button>
+            </form>
         </section>
         <section id="play_tournament">
             <div id="tournament-id" class="tournament">
@@ -258,32 +276,9 @@
             <section id="win-tournament-id">
                 <img id="win-tournament-background-id" src="./resrc/win_tournament.gif">
             </section>
-            <!-- <div calss="glo">
-                <div class="square">
-                    </div>
-                </div> -->
-            <!-- </div> -->
             <section id="tournament_list">
-                <div class="outer">
-                    <div class="middle square">
-                        <div id="tournament_content" class="inner">
-                            <!-- <div class="student">
-                                <img src="https://cdn.intra.42.fr/users/3e7d3dd26c2be1f602ed1d631b17bdbb/mkatfi.JPG" alt="Student Icon" class="student-icon">
-                                <span class="student-name">Student Name 1</span>
-                            </div>
-                            <div class="student">
-                                <img src="https://cdn.intra.42.fr/users/3e7d3dd26c2be1f602ed1d631b17bdbb/mkatfi.JPG" alt="Student Icon" class="student-icon">
-                                <span class="student-name">Student Name 2</span>
-                            </div>
-                            <div class="student">
-                                <img src="https://cdn.intra.42.fr/users/3e7d3dd26c2be1f602ed1d631b17bdbb/mkatfi.JPG" alt="Student Icon" class="student-icon">
-                                <span class="student-name">Student Name 3</span>
-                            </div>
-                            <div class="student">
-                                <img src="https://cdn.intra.42.fr/users/3e7d3dd26c2be1f602ed1d631b17bdbb/mkatfi.JPG" alt="Student Icon" class="student-icon">
-                                <span class="student-name">Student Name 3</span>
-                            </div> -->
-                        </div>
+                <div class="conteudo">
+                    <div id="tournament_content" class="caixa">
                     </div>
                 </div>
             </section>
@@ -295,5 +290,10 @@
     <script src="leader.js"></script>
     <script src="data.js"></script>
     <script src="token.js"></script>
+    <script src="suggest.js"></script>
+    <script src="invite.js"></script>
+    <script src="challenge.js"></script>
+    <script src="notif.js"></script> 
+    <script src="msgfriend.js"></script>
 </body>
 </html>

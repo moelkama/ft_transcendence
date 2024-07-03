@@ -101,10 +101,8 @@ class   Tournament(AsyncWebsocketConsumer):
         # self.tournament_name = "None"
         self.group_name = "None"
         self.avaible = True
-        query_string = self.scope['query_string'].decode().split('&')
-        token = query_string[0]
-        alias_input = query_string[1]
-        data = endpoint(token.split('=')[0])
+        query_string = self.scope['query_string'].decode().split('=')[1]
+        data = endpoint(query_string)
         self.user = User(data[0])
         self.tournament_name = tournament_name
         # self.user.x = x
@@ -118,8 +116,7 @@ class   Tournament(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.tournament_name,
         {
             'type': 'send_data',
-            # 'data':json.dumps({'type':'tournament.list', 'players':[{'login':u.user.username, 'icon':u.user.photo_profile} for u in users]})
-            'data':json.dumps({'type':'tournament.list', 'players':[{'login':u.user.username, 'icon':u.user.photo_profile} for u in waiting.values()]})
+            'data':json.dumps({'type':'tournament.list', 'players':[{'login':u.user.display_name, 'icon':u.user.photo_profile} for u in waiting.values()]})
         })
         if len(waiting) == N:
             x = 1

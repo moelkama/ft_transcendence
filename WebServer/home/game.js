@@ -54,6 +54,8 @@ var first_time = true;
 
 function    disactiv_sections()
 {
+    document.getElementById("home").style.display = 'none';
+    document.querySelector('.conteudo').style.display = 'none';
     document.querySelectorAll('section').forEach(section => {
         section.classList.remove('active');
     });
@@ -62,10 +64,7 @@ function    disactiv_sections()
 function    active_section(section_id)
 {
     disactiv_sections();
-    // if (section_id == 'play')
-    //     elem.classList.add('active');
-    // else
-        document.getElementById(section_id).classList.add('active');
+    document.getElementById(section_id).classList.add('active');
 }
 
 function    display_ping_pong(data, section_id)
@@ -75,9 +74,11 @@ function    display_ping_pong(data, section_id)
         first_time = false        
         for (let i = 0; i < data.players.length; i++)
         {
+            console.log("https://127.0.0.1/" + data.players[i].icon);
             document.getElementById(data.players.length.toString() + "-canvas-display_name-id-" + i.toString()).innerHTML = data.players[i].login;
             document.getElementById(data.players.length.toString() + "-canvas-icon-id-" + i.toString()).src = "https://127.0.0.1/" + data.players[i].icon;
         }
+        console.log("000000000=>", section_id);
         active_section(section_id);
         console.log('-----------display_ping_pong--------');
         var countdown = 3;
@@ -100,7 +101,6 @@ function showResult(result)
     {
         message.textContent = 'You Won!';
         message.style.color = 'green';
-        // document.getElementById('result-gif').src = "https://cdn.dribbble.com/users/7421625/screenshots/18722898/media/9dc2ccd128c89b19dddd55447ba5e1d0.gif"
         document.getElementById('result-gif').src = "https://mir-s3-cdn-cf.behance.net/project_modules/disp/e70bcc65284623.5aef51b58b0c9.gif";
     }
     else if (result == 'Loser')
@@ -111,7 +111,6 @@ function showResult(result)
         document.getElementById('result-gif').src = "https://www.shutterstock.com/shutterstock/photos/449380606/display_1500/stock-vector-you-lose-comic-speech-bubble-cartoon-game-assets-449380606.jpg"
     }
     active_section(id);
-    // document.getElementById('resultModal').classList.add('active');
 }
 
 function closeModal() {
@@ -153,17 +152,18 @@ document.addEventListener("keyup", (event) => {
         main_socket.send(JSON.stringify('Stop'));
 });
 
-async function get_url(socket_url, parameters)
+async function get_url(socket_url)
 {
     const response = await fetch('/api/token/');
     if (!response.ok)
         throw new Error('Network response was not ok ' + response.statusText);
     data =  await response.json();
-    return `wss://${window.location.host}${socket_url}?token=${data.token}`;//&alias=${parameters}
+    return `wss://${window.location.host}${socket_url}?token=${data.token}`;
 }
 
 function    tournament_list(data)
 {
+    document.getElementById('tournament_input').style.display = 'none';
     parent = document.getElementById('tournament_content');
     parent.innerHTML = '';
     data.players.forEach((element) =>{
@@ -182,9 +182,11 @@ function    tournament_list(data)
         div.appendChild(span);
         parent.appendChild(div);
         });
+    active_section('tournament_list');
+    document.querySelector('.conteudo').style.display = 'flex';
 }
 
-async function run(section_id, socket_url, canvas_id, parameters)
+async function run(section_id, socket_url, canvas_id)
 {
     try
     {
@@ -196,12 +198,8 @@ async function run(section_id, socket_url, canvas_id, parameters)
         ctx = elem.getContext("2d");
         width = elem.width
         height = elem.height
-        main_socket = new WebSocket(await get_url(socket_url, parameters));
+        main_socket = new WebSocket(await get_url(socket_url));
 
-        // console.log("--fewijji=====>", section_id);
-        // if (section_id == 'play_tournamet')
-        // else
-        // // active_section(section_id);
         main_socket.onopen = function(event) {
             console.log("game WebSocket connection established.");
         };
@@ -237,7 +235,7 @@ async function run(section_id, socket_url, canvas_id, parameters)
 }
 
 function navigate(section_id) {
-    document.getElementById("home").style.display = 'none';
+    console.log(section_id);
     if (section_id == 'play')
     {
         active_section('loading-section-id');
@@ -253,6 +251,53 @@ function navigate(section_id) {
         active_section('loading-section-id');
         run('play-4', '/wss/four_players/', '4-canvas-id');
     }
+    else if (section_id == 'tournament_input')
+    {
+        disactiv_sections();
+        document.getElementById('tournament_input').style.display = 'flex';
+    }
     else
         active_section(section_id);
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('display_name-form-id').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        const csrfToken = document.getElementById('display_name_csrfToken').value;
+        fetch('/display_name/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === true)
+            {
+                console.log('hello');
+                navigate('play_tournament');
+            }
+            else
+            {
+                document.getElementById('display_name_err').innerHTML = data.message;
+                document.getElementById('display_name_err').style.color = 'red';
+            }
+        })
+        .catch(error => {
+            document.getElementById('messages').innerHTML = error;
+            document.getElementById('messages').style.color = 'red';
+        });
+    });
+    (function get_csrf_token(){
+        fetch('/api/csrf-token/')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('display_name_csrfToken').value = data.csrfToken;
+        })
+        .catch(error => console.error('Error fetching CSRF token:', error));
+    })();
+    console.log(document.getElementById('home').style.display);
+    document.getElementById('home').style.display = 'none';
+});

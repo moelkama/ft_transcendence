@@ -12,14 +12,14 @@ push :
 	git push 
 
 run :
-	docker-compose up
+	docker compose up
 
 build :
-	docker-compose up --build
+	docker compose up --build
 
 down:
 
-	docker-compose down -v 
+	docker compose down -v 
 
 rmv : per
 	rm -rf postgreSql
@@ -31,4 +31,7 @@ per :
 
 clean : 
 	docker compose  down 
-	docker image prune -f --all
+
+fclean : clean
+	docker system prune -a
+re : fclean all

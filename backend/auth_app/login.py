@@ -5,7 +5,7 @@ from django.shortcuts import  redirect
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
-from . serializers import TaskSerializer ,MatchSerializer
+from . serializers import TaskSerializer 
 
 def login_required(request):
     access_token = request.session.get('user_id')
@@ -39,6 +39,9 @@ def get_match_history(request):
     
 
 def logout(request):
+    user = CustomUser.objects.get(id=request.session.get('user_id'))
+    user.is_online = False
+    user.save()
     log(request)
     return redirect('/')
 
@@ -60,15 +63,13 @@ def calculate_ranking(user):
     return 0
 
 def leadrboard(request):
-    all_users = CustomUser.objects.all()
+    all_users = CustomUser.objects.all().exclude(username='root')
     all_users = sorted(all_users, key=lambda x: x.score, reverse=True)
     data = []
     for user in all_users:
         user.ranking = calculate_ranking(user)
         user.total_match = user.win + user.lose
         data.append(user)
-        if len(data) == 7:
-            break
     dataseriaser = TaskSerializer(data, many=True)
     return JsonResponse(dataseriaser.data,safe=False)
 
@@ -90,7 +91,6 @@ def token(request):
     contex = {'token': token}
     return JsonResponse(contex)
 
-
 def update_profile(request):
     if request.method == 'POST':
         user = login_required(request)
@@ -110,6 +110,23 @@ def update_username(request):
         user.username = request.POST.get('username')
         user.save()
     return redirect('/home/')
+
+####################################
+def set_display_name(request):
+    if request.method == 'POST':
+        user = login_required(request)
+        user.display_name = ''
+        new_display_name = request.POST.get('display_name')
+        if len(new_display_name) > 10:
+            return JsonResponse({'status': False, 'message': 'display name Too large'}, status=200)
+        if CustomUser.objects.filter(display_name=new_display_name).exclude(id=user.id).exists():
+            return JsonResponse({'status': False, 'message': 'display name already taken'}, status=200)
+        user.display_name = new_display_name
+        user.save()
+        return JsonResponse({'status': True}, status=200)
+    else:
+        return JsonResponse({'status': False, 'message': 'Invalid request method'}, status=405)
+####################################
 
 @csrf_exempt
 def csrf_token(request):

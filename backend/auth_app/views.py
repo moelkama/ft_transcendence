@@ -1,21 +1,23 @@
 
 from django.contrib.auth.models import User
-from rest_framework.authtoken.models import Token
-from django.shortcuts import redirect
+from rest_framework.authtoken.models import Token # type: ignore
+from django.shortcuts import redirect 
 from django.http import HttpResponseBadRequest
 from urllib.parse import urlencode
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions # type: ignore
 from .serializers import TaskSerializer ,MatchSerializer
 import requests 
 import secrets
 import os
+from django.conf import settings
+
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate
 from .forms import CustomUserForm 
 from .models import *
 from .forms import CustomUserForm
 from .models import CustomUser ,all_Match
-from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.models import Token # type: ignore
 from django.http import JsonResponse
 
 state = secrets.token_urlsafe(16)
@@ -34,6 +36,8 @@ def SignIn(request):
             token ,_ = Token.objects.get_or_create(user=user)
             request.session['user_id'] = user.id
             request.session['token'] = token.key
+            user.is_online = True
+            user.save()
             return JsonResponse({'alert': 'ok', 'redirect_url': '/home/'}, status=200)
         else:
             return JsonResponse({'alert': 'Username or Password is incorrect'}, status=200)
@@ -77,31 +81,51 @@ def exchange_code_for_token(code):
         return response_data['access_token']
     else:
         return None
-
+    
 def store_data_in_database(request,access_token):
     headers = {'Authorization': f'Bearer {access_token}'}
     response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
     if response.status_code == 200:
         user_data = response.json()
-        """ checking if user already exists in database"""
         login = user_data['login']
         try:
-            user = CustomUser.objects.get(username=login)
+            fuser = CustomUser.objects.get(unigue_id=user_data['id'])
         except CustomUser.DoesNotExist:
-            user = None
-        if user:
-            if user.unigue_id != user_data['id']:
-                login = login + str(user_data['id'])
-
-        user, created = CustomUser.objects.get_or_create(username=login, email=user_data['email'])
-        if  created:
-            user.first_name = user_data['displayname'].split(' ')[0]
-            user.last_name = user_data['displayname'].split(' ')[1]
-            user.unigue_id = user_data['id']
+            fuser = None
+        if fuser is None:
+            try:
+                user = CustomUser.objects.get(username=login)
+            except CustomUser.DoesNotExist:
+                user = None
+            if user:
+                if user.unigue_id != user_data['id']:
+                    login = login + str(user_data['id'])
+            user, created = CustomUser.objects.get_or_create(username=login, email=user_data['email'])
+            if  created:
+                user.first_name = user_data['displayname'].split(' ')[0]
+                user.last_name = user_data['displayname'].split(' ')[1]
+                user.unigue_id = user_data['id']
+                profile_picture_url = user_data['image']['link']
+                response = requests.get(profile_picture_url)
+                if response.status_code == 200:
+                    filename = os.path.basename(profile_picture_url)
+                    save_path = os.path.join(settings.MEDIA_ROOT, 'User_profile', filename)
+                    with open(save_path, 'wb') as f:
+                        f.write(response.content)
+                    user.photo_profile = f'User_profile/{filename}'
+                    user.save()
+                user.save()
+            token,_,= Token.objects.get_or_create(user=user)
+            request.session['user_id'] = user.id
+            request.session['token'] = token.key
+            user.is_online = True
             user.save()
-        token,_,= Token.objects.get_or_create(user=user)
-        request.session['user_id'] = user.id
-        request.session['token'] = token.key
+        else:
+            token,_,= Token.objects.get_or_create(user=fuser)
+            request.session['user_id'] = fuser.id
+            request.session['token'] = token.key
+            fuser.is_online = True
+            fuser.save()
 
 
 def callback(request):
