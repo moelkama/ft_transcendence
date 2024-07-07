@@ -14,7 +14,6 @@ class CustomUser(AbstractUser):
     is_online = models.BooleanField(default=False)
     def __str__(self):
         return self.username
-    
 
 class all_Match(models.Model):
     winner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='winner')

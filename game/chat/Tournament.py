@@ -6,7 +6,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from . views import endpoint
 
-N = 4
+N = 8
 waiting = {}
 tournaments = {}
 tournament_name = 'tournament_' + datetime.now().time().strftime("%H_%M_%S_%f")
@@ -101,8 +101,12 @@ class   Tournament(AsyncWebsocketConsumer):
         # self.tournament_name = "None"
         self.group_name = "None"
         self.avaible = True
-        query_string = self.scope['query_string'].decode().split('=')[1]
-        data = endpoint(query_string)
+        # query_string = self.scope['query_string'].decode().split('=')[1]
+        query_parameters = self.scope['query_string'].decode().split('&')
+        tocken_id = query_parameters[0].split('=')[1]
+        game_typ = query_parameters[1].split('=')[1]
+        print("======>", tocken_id)
+        data = endpoint(tocken_id)
         self.user = User(data[0])
         self.tournament_name = tournament_name
         # self.user.x = x
@@ -111,7 +115,7 @@ class   Tournament(AsyncWebsocketConsumer):
         # if self.user.login in waiting:
             # waiting[self.user.login].send("you are already in another connection biiiiiitch")
         # waiting[self.user.login] = self
-        waiting[str(x)] = self
+        waiting[str(x)] = self 
         self.x = str(x)
         await self.channel_layer.group_send(self.tournament_name,
         {

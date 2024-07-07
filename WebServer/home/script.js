@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
             section.style.display = "none";
           }
         });
+        // fetch_profile_data();
       });
     });
     // Initial state
@@ -94,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function showNotificationsModal() {
     const modal = document.getElementById('notifi');
     modal.style.display = 'flex';
+    ft_fetch();
   }
   function closeNotificationsModal() {
     const modal = document.getElementById('notifi');

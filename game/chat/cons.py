@@ -224,16 +224,27 @@ class   User:
             'icon':self.photo_profile,
         }
 
+from . main_socket import connects
+
 class RacetCunsumer(AsyncWebsocketConsumer):
     async def connect(self):
         print("----------------connect----------------")
         global group_name
         await self.accept()
         self.avaible = True
-        query_string = self.scope['query_string'].decode().split('=')[1]
-        data = endpoint(query_string)        
+        query_parameters = self.scope['query_string'].decode().split('&')
+        tocken_id = query_parameters[0].split('=')[1]
+        game_type = query_parameters[1].split('=')[1]
+        # vs = query_parameters[2].split('=')[1]
+        room_creater = query_parameters[2].split('=')[1]
+        print("room_creater::::::", room_creater)
+        data = endpoint(tocken_id)
         self.user = User(data[0])
-        self.group_name = group_name
+        print("hahowa::::::::::", tocken_id, " **********  ", self.user.username, data[0])
+        if game_type == 'random':
+            self.group_name = group_name
+        else:
+            self.group_name = connects[room_creater].room_name
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         if self.group_name in rooms:
             if rooms[self.group_name].players[0].user.username != self.user.username:
@@ -242,6 +253,7 @@ class RacetCunsumer(AsyncWebsocketConsumer):
                 rooms[self.group_name].set_player(self, 1)
                 asyncio.create_task(start_game(self.group_name))
             else:
+                print("3333333333333333333333333333333333333333", self.user.username)
                 await self.close()
         else:
             self.racket = racket(0, (height - hh) / 2, 0, height)
@@ -258,10 +270,10 @@ class RacetCunsumer(AsyncWebsocketConsumer):
             await self.send(event['data'])
 
     async def disconnect(self, event):
-        print("----------disconnect-----------")
+        print("----------disconnect-----------", self.user.username)
         self.avaible = False
-        # if (self.group_name in rooms):
-        #     del rooms[self.group_name]
+        if (self.group_name in rooms):
+            del rooms[self.group_name]
         # await self.channel_layer.group_send(self.group_name,
         # {
         #     'type': 'send_data',

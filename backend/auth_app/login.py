@@ -88,7 +88,7 @@ def token(request):
     if not user:
         return HttpResponseBadRequest("Forbidden", status=403)
     token = request.session.get('token')
-    contex = {'token': token}
+    contex = {'token': token, 'id': request.session.get('user_id')}
     return JsonResponse(contex)
 
 def update_profile(request):

@@ -18,7 +18,7 @@
             <ul>
                 <li><a class="nav-link" data-target="home" href="#home" onclick="disactiv_sections()">Home</a></li>
                 <li><a class="nav-link" data-target="profile" href="#profile"  onclick="disactiv_sections()">Profile</a></li>
-                <li><div class="profil" id="imageprofile"></div></li>
+                <li><div class="profil" id="imageprofile"><img id="profileimg"></div></li>
             </ul>
         </div>
     </nav>
@@ -195,9 +195,24 @@
                 </div>
             </section>
             <section id="resultModal">
-                <span class="close" onclick="closeModal()">&times;</span>
+                <span class="close" onclick="closeModal('resultModal')">&times;</span>
                 <span id="resultMessage"></span>
                 <img id="result-gif">
+            </section>
+            <section id="refuse_game_id">
+                <span class="close" onclick="closeModal('refuse_game_id')">&times;</span>
+                <div class="users">
+                    <div class="user1">
+                        <img id="game_notification_icon_id" class="icon" src="https://cdn.intra.42.fr/users/9c7c59de228285641f8bb4f2406eac94/moelkama.JPG">
+                        <h2 id="game_notification_username_id" class="display-name"></h2>
+                    </div>
+                    <div class="user2">
+                        <!-- <button type="submit" class="buttonn" onclick="navigate('play')">Retry</button> -->
+                        <button type="submit" class="buttonn" onclick="navigate('play')">Play Random</button>
+                    </div>
+                </div>
+                <!-- <span id="resultMessage"></span> -->
+                <!-- <img id="result-gif"> -->
             </section>
             <section id="play-4" >
                 <div class="ping-pong">
@@ -274,11 +289,27 @@
                 </div>
             </section>
             <section id="win-tournament-id">
-                <img id="win-tournament-background-id" src="./resrc/win_tournament.gif">
+                <img id="win-tournament-background-id">
+                <!-- <img id="win-tournament-background-id" src="./resrc/win_tournament.gif"> -->
             </section>
             <section id="tournament_list">
                 <div class="conteudo">
                     <div id="tournament_content" class="caixa">
+                    </div>
+                </div>
+            </section>
+            <section id="game_notification_id" class="game_notification">
+                <div class="user1">
+                    <img id="game_notification_icon_id" class="icon">
+                    <h2 id="game_notification_username_id" class="display-name"></h2>
+                </div>
+                <h2>Do you want to play a game?</h2>
+                <div class="users">
+                    <div class="user1">
+                        <button id="acceptBtn_play" onclick="accept_game()">Accept</button>
+                    </div>
+                    <div class="user2">
+                        <button id="refuseBtn_play" onclick="refuse_game()">Refuse</button>
                     </div>
                 </div>
             </section>

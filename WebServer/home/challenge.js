@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 let addfriend = document.createElement('button');
                 addfriend.textContent = "Challenge";
                 addfriend.id = data[i].username;
+                addfriend.addEventListener('click', function (e){
+                    challenge_friend(e, data[i].username);
+                });
 
                 container.appendChild(img);
                 container.appendChild(username);

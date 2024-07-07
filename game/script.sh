@@ -1,6 +1,10 @@
 #!/bin/bash
 
-sleep 3
+# until pg_isready -h $PostgreSQL -eq 0;
+#     do
+#         echo "waiting for PostgreSQL connection!"
+#     done
+sleep 12
 echo "PostgreSQL is now running!"
 echo "Starting Django server...."
 

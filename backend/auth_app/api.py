@@ -5,6 +5,18 @@ import json
 from .login import login_required
 
 from . serializers import TaskSerializer
+def post_is_active(request):
+    data = request.POST.get('is_online')
+    id = request.POST.get('id')
+    user = CustomUser.objects.get(id=request.session.get('id'))
+    if 'is_oline' in data :
+        user.is_online = True
+    else:
+        user.is_online = False
+    user.save
+    return JsonResponse({"status":True})
+
+
 
 def send_friend_request(request):
     if request.method == 'POST':

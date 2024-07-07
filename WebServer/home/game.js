@@ -1,5 +1,6 @@
 var url;
 
+var game_socket = NaN;
 var main_socket = NaN;
 var elem = NaN;
 var ctx = NaN;
@@ -13,6 +14,65 @@ function draw_ball(b)
     ctx.stroke();
     ctx.fillStyle = "white";
     ctx.fill();
+}
+
+async function get_url(socket_url) {
+    try {
+        const response = await fetch('/api/token/');
+        const data = await response.json();
+        return `wss://${window.location.host}${socket_url}?token=${data.token}`;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function createWebSocket() {
+    try {
+        const socket_url = '/wss/main_socket/';
+        const url = await get_url(socket_url);
+        main_socket = new WebSocket(url);
+
+        main_socket.onopen = function(event) {
+            console.log("main WebSocket connection established.");
+        };
+
+        main_socket.onmessage = function(event) {
+            console.log("Message from server: ", event.data);
+            var data = JSON.parse(event.data);
+            if (data.type == 'game.challenge')
+            {
+                document.getElementById('game_notification_icon_id').src = "https://127.0.0.1/" + data.vs.icon;
+                document.getElementById('game_notification_username_id').innerHTML = data.vs.login;
+                document.getElementById('game_notification_id').style.display = 'flex';
+            }
+            else if (data.type == 'game.refuse')
+            {
+                // document.getElementById('game_notification_icon_id').src = "https://127.0.0.1/"  + data.vs.icon;
+                document.getElementById('game_notification_username_id').innerHTML = data.vs.login;
+                active_section('refuse_game_id');
+            }
+        };
+
+        main_socket.onerror = function(event) {
+            console.error("WebSocket error observed");
+        };
+
+        main_socket.onclose = function(event) {
+            console.log("WebSocket connection closed:", event);
+        };
+    } catch (error) {
+        console.error("Error creating WebSocket:", error);
+    }
+}
+
+// createWebSocket();
+
+function challenge_friend(e, username)
+{
+    console.log("challenge with :", username);
+    main_socket.send(JSON.stringify({'type':'room.create', 'vs':username}));
+    active_section('loading-section-id');
+    run('play', '/wss/game/', '2-canvas-id', {'type':'room', 'room_creater':document.getElementById('login').textContent});
 }
 
 function put_center()
@@ -71,7 +131,8 @@ function    display_ping_pong(data, section_id)
 {
     if (first_time)
     {
-        first_time = false        
+        first_time = false
+        ctx.clearRect(0, 0, width, height);
         for (let i = 0; i < data.players.length; i++)
         {
             console.log("https://127.0.0.1/" + data.players[i].icon);
@@ -113,8 +174,24 @@ function showResult(result)
     active_section(id);
 }
 
-function closeModal() {
-    document.getElementById('resultModal').classList.remove('active');
+function    accept_game()
+{
+    console.log("accept");
+
+    document.getElementById('game_notification_id').style.display = 'none';
+    run('play', '/wss/game/', '2-canvas-id', {'type':'room', 'room_creater':document.getElementById('game_notification_username_id').innerHTML});
+}
+
+function    refuse_game()
+{
+    console.log("refuse");
+    document.getElementById('game_notification_id').style.display = 'none';
+    main_socket.send(JSON.stringify({'type':'room.refuse', 'vs':document.getElementById('game_notification_username_id').innerHTML}));
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    document.getElementById("home").style.display = 'flex';
 }
 
 var round = 0;
@@ -142,24 +219,15 @@ function    tournament_info(players, section_id)
 
 document.addEventListener("keydown", (event) => {
     if (event.key == "ArrowUp")
-        main_socket.send(JSON.stringify('Up'));
+        game_socket.send(JSON.stringify('Up'));
     else if (event.key == "ArrowDown")
-        main_socket.send(JSON.stringify('Down'));
+        game_socket.send(JSON.stringify('Down'));
 });
 
 document.addEventListener("keyup", (event) => {
     if (event.key == "ArrowUp" || event.key == "ArrowDown")
-        main_socket.send(JSON.stringify('Stop'));
+        game_socket.send(JSON.stringify('Stop'));
 });
-
-async function get_url(socket_url)
-{
-    const response = await fetch('/api/token/');
-    if (!response.ok)
-        throw new Error('Network response was not ok ' + response.statusText);
-    data =  await response.json();
-    return `wss://${window.location.host}${socket_url}?token=${data.token}`;
-}
 
 function    tournament_list(data)
 {
@@ -186,34 +254,35 @@ function    tournament_list(data)
     document.querySelector('.conteudo').style.display = 'flex';
 }
 
-async function run(section_id, socket_url, canvas_id)
+async function run(section_id, socket_url, canvas_id, type)
 {
     try
     {
         first_time = true;
         round = 0;
-        if (main_socket)
-            main_socket.close(1000, 'Normal Closure');
+        if (game_socket){
+            game_socket.close(1000, 'Normal Closure');}
         elem = document.getElementById(canvas_id);
         ctx = elem.getContext("2d");
         width = elem.width
         height = elem.height
-        main_socket = new WebSocket(await get_url(socket_url));
+        URL = await get_url(socket_url) + '&type=' + type.type + '&room_creater=' + type.room_creater
+        console.log(URL);
+        game_socket = new WebSocket(URL);
 
-        main_socket.onopen = function(event) {
+        game_socket.onopen = function(event) {
             console.log("game WebSocket connection established.");
         };
 
-        main_socket.onmessage = function (e)
+        game_socket.onmessage = function (e)
         {
             var data = JSON.parse(e.data)
-            // console.log(data);
+            console.log('ssssssssssssssssssssss');
             if (data.type == 'game.info')
                 display_ping_pong(data, section_id);
             else if (data.type == 'game.state')
             {
                 draw(data);
-                // console.log("iej")
             }
             else if (data.type == 'tournament.list')
                 tournament_list(data);
@@ -239,17 +308,17 @@ function navigate(section_id) {
     if (section_id == 'play')
     {
         active_section('loading-section-id');
-        run('play', '/wss/game/', '2-canvas-id');
+        run('play', '/wss/game/', '2-canvas-id', {'type':'random', 'vs':'undefined'});
     }
     else if (section_id == 'play_tournament')
     {
         active_section('tournament_list');
-        run('play', '/wss/tournament/' , '2-canvas-id');
+        run('play', '/wss/tournament/' , '2-canvas-id', {'type':'random', 'vs':'undefined'});
     }
     else if (section_id == 'ping-pong-4')
     {
         active_section('loading-section-id');
-        run('play-4', '/wss/four_players/', '4-canvas-id');
+        run('play-4', '/wss/four_players/', '4-canvas-id', {'type':'random', 'vs':'undefined'});
     }
     else if (section_id == 'tournament_input')
     {
@@ -261,43 +330,42 @@ function navigate(section_id) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('display_name-form-id').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const formData = new FormData(this);
-        const csrfToken = document.getElementById('display_name_csrfToken').value;
-        fetch('/display_name/', {
-            method: 'POST',
-            body: formData,
-            headers: {
+        (function get_csrf_token(){
+            fetch('/api/csrf-token/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('display_name_csrfToken').value = data.csrfToken;
+            })
+        .catch(error => console.error('Error fetching CSRF token:', error));
+        })();
+
+        document.getElementById('display_name-form-id').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const csrfToken = document.getElementById('display_name_csrfToken').value;
+            fetch('/display_name/', {
+                method: 'POST',
+                body: formData,
+                headers: {
                 'X-CSRFToken': csrfToken,
             }
         })
         .then(response => response.json())
         .then(data => {
             if (data.status === true)
-            {
-                console.log('hello');
-                navigate('play_tournament');
-            }
-            else
-            {
-                document.getElementById('display_name_err').innerHTML = data.message;
-                document.getElementById('display_name_err').style.color = 'red';
-            }
-        })
-        .catch(error => {
-            document.getElementById('messages').innerHTML = error;
-            document.getElementById('messages').style.color = 'red';
+                {
+                    console.log('hello');
+                    navigate('play_tournament');
+                }
+                else
+                {
+                    document.getElementById('display_name_err').innerHTML = data.message;
+                    document.getElementById('display_name_err').style.color = 'red';
+                }
+            })
+            .catch(error => {
+                document.getElementById('messages').innerHTML = error;
+                document.getElementById('messages').style.color = 'red';
+            });
         });
-    });
-    (function get_csrf_token(){
-        fetch('/api/csrf-token/')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('display_name_csrfToken').value = data.csrfToken;
-        })
-        .catch(error => console.error('Error fetching CSRF token:', error));
-    })();
-    console.log(document.getElementById('home').style.display);
-    document.getElementById('home').style.display = 'none';
 });

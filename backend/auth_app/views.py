@@ -12,7 +12,7 @@ import os
 from django.conf import settings
 
 from django.shortcuts import redirect
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate ,login
 from .forms import CustomUserForm 
 from .models import *
 from .forms import CustomUserForm
@@ -24,6 +24,8 @@ state = secrets.token_urlsafe(16)
 client_id =  os.environ.get('client_id')
 redirect_uri = os.environ.get('redirect_uri')
 client_secret = os.environ.get('client_secret')
+
+
 
 def SignIn(request):
     if request.user.is_authenticated:
@@ -37,6 +39,7 @@ def SignIn(request):
             request.session['user_id'] = user.id
             request.session['token'] = token.key
             user.is_online = True
+            login(request,user)
             user.save()
             return JsonResponse({'alert': 'ok', 'redirect_url': '/home/'}, status=200)
         else:
@@ -118,13 +121,13 @@ def store_data_in_database(request,access_token):
             token,_,= Token.objects.get_or_create(user=user)
             request.session['user_id'] = user.id
             request.session['token'] = token.key
-            user.is_online = True
+            # user.is_online = True
             user.save()
         else:
             token,_,= Token.objects.get_or_create(user=fuser)
             request.session['user_id'] = fuser.id
             request.session['token'] = token.key
-            fuser.is_online = True
+            # fuser.is_online = True
             fuser.save()
 
 
@@ -146,8 +149,8 @@ class TaskListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return self.queryset.filter(id=self.request.user.id)
+    # def get_queryset(self):
+    #     return self.queryset.filter(id=self.request.user.id)
 
 
 class TaskRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -155,8 +158,8 @@ class TaskRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return self.queryset.filter(id=self.request.user.id)
+    # def get_queryset(self):
+    #     return self.queryset.filter(id=self.request.user.id)
 
 class MatchListCreateAPIView(generics.ListCreateAPIView):
     queryset = all_Match.objects.all()
