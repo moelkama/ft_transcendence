@@ -1,68 +1,3 @@
-// document.addEventListener('DOMContentLoaded', () => {
-//     const signUpButton = document.getElementById('signup-button');
-//     const targetElement = document.getElementById('ball');
-//     const parentElement = document.getElementById('container');
-//     const lineElement = document.getElementById('line');
-
-
-//     signUpButton.addEventListener('click', () => {
-//         // Pause the animation
-
-//         targetElement.className = "centered";
-//         targetElement.style.animationPlayState = 'none';
-//         lineElement.className = "nline";
-
-//         // Get the dimensions of the parent container and the ball
-//         const parentWidth = parentElement.offsetWidth;
-//         const parentHeight = parentElement.offsetHeight;
-//         const ballWidth = targetElement.offsetWidth;
-//         const ballHeight = targetElement.offsetHeight;
-
-//         // Calculate the position to center the ball
-//         const leftPosition = (parentWidth - ballWidth) / 2;
-//         const topPosition = (parentHeight - ballHeight) / 2;
-
-//         // Set the new position of the ball
-//         targetElement.style.left = `${leftPosition}px`;
-//         targetElement.style.top = `${topPosition}px`;
-
-
-//         targetElement.style.animationPlayState = 'paused';
-//         // Print information about the target element
-//         console.log(`Element resized to ${ballWidth}px by ${ballHeight}px and centered at (${leftPosition}px, ${topPosition}px)`);
-//     });
-// });
-
-// document.addEventListener('DOMContentLoaded', function() {
-//     already_logged();
-//     const links = document.querySelectorAll('.nav-link');
-//     const sections = document.querySelectorAll('.content-section');
-
-//     links.forEach(link => {
-//         link.addEventListener('click', function(e) {
-//             e.preventDefault();
-//             const targetId = this.getAttribute('data-target');
-
-//             sections.forEach(section => {
-//                 if (section.id === targetId) {
-//                     section.style.display = 'flex';
-//                 } else {
-//                     section.style.display = 'none';
-//                 }
-//             });
-//         });
-//     });
-
-//     // Show the home section by default
-//     // document.getElementById('home').style.display = 'flex';
-//     // document.getElementById('chat').style.display = 'none';
-
-//     // document.getElementById('profile').style.display = 'none';
-
-// });
-
-
-  
 function already_logged() {
     fetch('/api/already_logged/')
         .then(response => {
@@ -71,13 +6,14 @@ function already_logged() {
             }
         })
         .then(data => {
-            if (data.logged)
-                window.location.href = "/home/";
+            if (data.status === true)
+                console.log('Already logged in');
+                console.log(data);
         })
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // already_logged();
+    already_logged();
     fetch('/api/csrf-token/')
         .then(response => response.json())
         .then(data => {
@@ -96,17 +32,14 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.alert === 'ok') {
+            if (data.status === true) {
                     window.location.href = "/home/";
             } else {
-                document.getElementById('messages').innerHTML =  data.alert;
+                document.getElementById('messages').innerHTML = 'Invalid username or password';
                 document.getElementById('messages').style.color = 'red';
             }
         })
-        .catch(error => {
-            document.getElementById('messages').innerHTML = error;
-            document.getElementById('messages').style.color = 'red';
-        });
+
 });
 
 function ft_sign_up() {
@@ -120,7 +53,7 @@ function ft_sign_up() {
 
 
 function ft_sign_in() {
-console.log('hello2');
+// console.log('hello2');
 
 const modal1 = document.getElementById('sign-up-form');
 modal1.style.display = 'none';
@@ -128,7 +61,7 @@ const modal = document.getElementById('login-form');
 modal.style.display = 'flex';
 }
   function closeLogoutModal() {
-    console.log('hello3');
+    // console.log('hello3');
     const modal1 = document.getElementById('sign-up-form');
     modal1.style.display = 'none';
     const modal = document.getElementById('login-form');
@@ -140,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             document.getElementById('csrfToken').value = data.csrfToken;
         })
-        .catch(error => console.error('Error fetching CSRF token:', error));
     document.getElementById('login-form-id2').addEventListener('submit', function(event) {
         event.preventDefault();
         const formData = new FormData(this);
@@ -156,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.status === true) {
 
-                // window.location.href = "/";
                 const modal1 = document.getElementById('sign-up-form');
                 modal1.style.display = 'none';
                 const modal = document.getElementById('login-form');
@@ -164,6 +95,14 @@ document.addEventListener('DOMContentLoaded', function() {
             } 
             else
             {
+                if (data.error.email != undefined)
+                {
+                    // console.log(data.error);
+                    document.getElementById('messageemail').innerHTML = data.error.email;
+                    document.getElementById('messageemail').style.color = 'red';
+                }
+                else
+                    document.getElementById('messageemail').innerHTML = '';
                 if (data.error.username != undefined)
                 {
                     document.getElementById('messageusername').innerHTML = data.error.username;
@@ -171,6 +110,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 else
                     document.getElementById('messageusername').innerHTML = '';
+                if (data.error.password1 != undefined)
+                {
+                    document.getElementById('messagepassword').innerHTML = data.error.password1;
+                    document.getElementById('messagepassword').style.color = 'red';
+                }
+                else
+                    document.getElementById('messagepassword').innerHTML = '';
                 if (data.error.password2 != undefined)
                 {
                     document.getElementById('messagepassword2').innerHTML = data.error.password2;
@@ -180,10 +126,5 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('messagepassword2').innerHTML = '';
             }
         })
-        .catch(error => {
-            document.getElementById('messages').innerHTML = error;
-            document.getElementById('messages').style.color = 'red';
-            
-        });
     });
 });

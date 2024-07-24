@@ -5,8 +5,10 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 # from asgiref.sync import sync_to_async
 from . cons import User, Match
 import requests
-
-connects = {}
+import os
+from . cons import add_padding
+from cryptography.fernet import Fernet
+connects = {}    
 
 class main_socket(AsyncWebsocketConsumer):
     async def connect(self):
@@ -16,15 +18,18 @@ class main_socket(AsyncWebsocketConsumer):
         self.avaible = True
         query_string = self.scope['query_string'].decode().split('&')
         token = query_string[0].split('=')[1]
-        # id = query_string[1][1]
-        data = endpoint(token)
-        self.user = User(data[0])
+        key = os.environ.get('encrypt_key')
+        f = Fernet(key)
+        token = f.decrypt(add_padding(token).encode()).decode()
+        id = query_string[1].split('=')[1]
+        data = endpoint(token, id)
+        self.user = User(data)
         # self.group_name = room_name
         # room_name = 'room_' + datetime.now().time().strftime("%H_%M_%S_%f")
         connects[self.user.username] = self
         headers = {'Authorization': f'Token {token}'}
         body = {
-            'is_online': True,
+            'avaible': True,
         }
         url = f'http://auth:8000/api/tasks/{self.user.id}/'
         requests.patch(url=url, headers=headers, data=body)
@@ -46,10 +51,13 @@ class main_socket(AsyncWebsocketConsumer):
         print("----------Main socket disconnect-----------")
         query_string = self.scope['query_string'].decode().split('&')
         token = query_string[0].split('=')[1]
+        key = os.environ.get('encrypt_key')
+        f = Fernet(key)
+        token = f.decrypt(add_padding(token).encode()).decode()
         connects[self.user.username] = self
         headers = {'Authorization': f'Token {token}'}
         body = {
-            'is_online': False,
+            'avaible': False,
         }
         url = f'http://auth:8000/api/tasks/{self.user.id}/'
         requests.patch(url=url, headers=headers, data=body)
