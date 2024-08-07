@@ -293,6 +293,7 @@ class RacetCunsumer(AsyncWebsocketConsumer):
                     asyncio.create_task(start_game(self.group_name))
             elif data.get('action') == 'Give_Up':
                 await self.close()
+
     async def send_data(self, event):
         if self.avaible:
             await self.send(event['data'])

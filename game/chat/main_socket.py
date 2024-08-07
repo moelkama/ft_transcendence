@@ -13,7 +13,6 @@ connects = {}
 class main_socket(AsyncWebsocketConsumer):
     async def connect(self):
         print("----------------Main socket connected----------------")
-        # global room_name
         await self.accept()
         self.avaible = True
         query_string = self.scope['query_string'].decode().split('&')
@@ -38,8 +37,8 @@ class main_socket(AsyncWebsocketConsumer):
         global room_name
         data = json.loads(text_data)
         if data.get('type') == 'room.create':
-            await connects[data.get('vs')].send(json.dumps({'type':'game.challenge', 'vs': self.user.serialize_User()}))
             self.room_name = 'room_' + datetime.now().time().strftime("%H_%M_%S_%f")
+            await connects[data.get('vs')].send(json.dumps({'type':'game.challenge', 'vs': self.user.serialize_User()}))
         elif data.get('type') == 'room.refuse':
             await connects[data.get('vs')].send(json.dumps({'type':'game.refuse', 'vs': self.user.serialize_User()}))
 

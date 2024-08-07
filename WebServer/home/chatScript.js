@@ -1,3 +1,4 @@
+import { view_profile } from './userInformation.js';
 
 function ParceDate(date){
     let _date = date.substr(0, date.indexOf('T'));
@@ -5,6 +6,86 @@ function ParceDate(date){
     return `${_date} ${_time}`;
 }
 
+
+function send_request(room_name, user_sender)
+{
+    fetch('/chatCsrftoken/')
+    .then(response => response.json())
+    .then(data => {
+        // console.log(data);
+        fetch('/readMessage/',{
+            method: 'POST',
+            headers :{
+                'Content-Type': 'application/json',
+                'X-CSRFToken': data.csrfToken,
+            },
+            body : JSON.stringify({ 
+                'username' : user_sender,
+                'room_name' : room_name,
+             })
+        })
+        .then(response =>{
+            return response.json();
+        })
+        .then(data=>{
+            // console.log(data);
+        })
+    })
+}
+
+function fetchAllMessage(userid, username)
+{
+    fetch('/chatCsrftoken/')
+    .then(response => response.json())
+    .then(data => {
+        fetch('/MessageUsers/',{
+            method: 'POST',
+            headers :{
+                'Content-Type': 'application/json',
+                'X-CSRFToken': data.csrfToken,
+            },
+            body : JSON.stringify({ 
+                'id_user' : userid,
+                'username' : username,
+             })
+        })
+        .then(response =>{
+            return response.json();
+        })
+        .then(data=>{
+            console.log(data);
+        })
+    })
+}
+
+function fetchConversation(userid, username)
+{
+    fetch('/chatCsrftoken/')
+    .then(response => response.json())
+    .then(data => {
+        fetch('/NotReaded/',{
+            method: 'POST',
+            headers :{
+                'Content-Type': 'application/json',
+                'X-CSRFToken': data.csrfToken,
+            },
+            body : JSON.stringify({ 
+                'id_user' : userid,
+                'username' : username,
+             })
+        })
+        .then(response =>{
+            return response.json();
+        })
+        .then(data=>{
+            console.log(data);
+            // if (data.status == 'success' && data.not_read != 0)
+            //     document.querySelector('.chat-aside-numberMessage').textContent = data.not_read;
+            
+        })
+    })
+}
+export {fetchConversation, fetchAllMessage}
 function generateRoomName(user1, user2)
 {
     let tab = [user1, user2]; 
@@ -13,10 +94,8 @@ function generateRoomName(user1, user2)
 }
 
 function hasNonPrintableChars(inputString) {
-    // console.log(":::" + inputString + ":::")
     for (var i = 0; i < inputString.length; i++) {
         var code = inputString.charCodeAt(i);
-        // console.log("code =====> " + code)
         if (code > 32 && code < 126) 
         {
             return true;
@@ -24,6 +103,7 @@ function hasNonPrintableChars(inputString) {
     }
     return false;
 }
+// fetchConversation(document.querySelector('#login').className, document.querySelector('#login').textContent)
 
 function create_chatRoom(map)
 {
@@ -39,17 +119,16 @@ function create_chatRoom(map)
     let user_image = document.createElement('img');
     let div_info = document.createElement('div');
     let div_menu = document.createElement('div');
-    button_chat.hidden = true;
-    chat_input.hidden = true;
-    let button_block = document.createElement('a');
-    chat_div.hidden = true;
+    let button_block = document.createElement('p');
     div_menu.className = 'user-info-menu';
-    button_block.className = 'menu-block-button'
-    button_block.href = "#"
-    let button_info = document.createElement('a');
+    button_block.className = 'menu-block-button';
+    let button_info = document.createElement('p');
     button_info.className = 'menu-info-button'
-    button_info.href = "#"
     let div_menu_child1 = document.createElement('div');
+    div_menu_child1.addEventListener('click', view_profile);
+    let button_game = document.createElement('p');
+    button_game.classList.add('menu-game-button');
+    
     let icon_div = document.createElement('i')
     icon_div.classList.add("fa-solid" ,"fa-user") 
     div_menu_child1.append(
@@ -68,28 +147,54 @@ function create_chatRoom(map)
         document.createElement('hr'),
         div_menu_child2
     );
+    let div_menu_child3 = document.createElement('div')
+    icon_div = document.createElement('i');
+    icon_div.classList.add('fa-solid', 'fa-table-tennis-paddle-ball');
+    div_menu_child3.append(
+        icon_div,
+        button_game
+    )
+    div_menu.append(
+        document.createElement('hr'),
+        div_menu_child3
+    );
+    div_menu_child3.addEventListener('click', (e) =>{
+        challenge_friend(e.currentTarget.id);
+    })
     var check = true;
     let username2;
     let username1;
     let room_name;
     let div_bolck_msg = document.createElement('div');
     div_bolck_msg.className = 'div-block-user'
+    let last_button;
+    let index = 0;
+    // fetchConversation(document.querySelector('#login').className, document.querySelector('#login').textContent)
     buttons_friends.forEach(button => {
         button.addEventListener('click', (e) =>
         {
-            chat_div.hidden = false
+            if (button == last_button)
+                return ;
+            chat_input.value = '';
+            chat_div.style.display = 'flex';
+            div_chat_tools.style.display = 'flex';
             if (chat_container.contains(div_menu))
             {
                 check = true;
                 chat_container.removeChild(div_menu);
             }
-            let index = 0;
-           
+            index = 0;
+            last_button = button;
             let header_username = document.querySelector("#chat-friend-name");
             chat_div.innerHTML = "";
+
             username1 = document.querySelector('#login').textContent;
-            username2 = button.id;
-            room_name = generateRoomName( username1,username2);
+            let usernameid = document.querySelector('#login').className;
+            div_menu_child3.id = button.querySelector('p').textContent;
+            
+            username2 = button.querySelector('p').textContent;
+            room_name = generateRoomName( usernameid ,button.id);
+            // console.log()
             let icon = document.createElement('i');
             icon.style.color = 'white';
             icon.classList.add('fa-solid', 'fa-ellipsis-vertical');
@@ -102,7 +207,6 @@ function create_chatRoom(map)
                 return response.json();
             })
             .then(data => {
-                
                 for (let i = 0; i < data.length; i++)
                 {
                     let div_parent = document.createElement("div");
@@ -134,24 +238,22 @@ function create_chatRoom(map)
 
                     div_parent.append(div_message, div_time);
                     chat_div.append(div_parent);
-
-                    // console.log(div_parent.clientHeight)
                     index += div_message.clientHeight;
-                    index += 5;
+                    index += 8;
                     div_time.style.top = `${index}px`
                     index += 10;
                     chat_div.scrollTop = chat_div.scrollHeight - chat_div.clientHeight;
                     
                 }
-             
+                send_request(room_name, username1);
+
             })
             .catch(error =>{ 
-                // console.error(error);
                 console.log(error);
             })
             let div_image = document.getElementById('image-chat');
             div_image.append(user_image);
-            header_username.innerHTML = username2;
+            header_username.innerHTML = button.querySelector('p').textContent;
             div_info.textContent = '';
             div_info.append(icon);
             div_info.className = 'chat-option-user';
@@ -164,8 +266,6 @@ function create_chatRoom(map)
             `
             chat_header.style.cssText = `border: 2px solid #bbbbbb7b;
             border-radius: 10px;`;
-            // chat_header.style.cssText = `background-color : gray; border-radius : 10px;`;
-           // socket part -----------------------------------------------------------------
             if (Web_socket != null)
             {
                 Web_socket.close();
@@ -176,7 +276,7 @@ function create_chatRoom(map)
                 Web_socket = new WebSocket(`wss://${window.location.host}/wss/chat/${room_name}/`);
             
             Web_socket.onopen = () =>{
-                console.log(`WebSocket server is running on ws://${window.location.host}:8003/${room_name}/`);
+                console.log(`WebSocket server is running on wss://${window.location.host}/${room_name}/`);
                 url = `/Converstaion/${room_name}/`;
                 fetch(url)
                 .then(response => {
@@ -220,18 +320,19 @@ function create_chatRoom(map)
                     console.log(error);
                 })
             }
+            let div_animate;
             Web_socket.onmessage = (e) =>{
+                send_request(room_name, username1);
                 let data_message = JSON.parse(e.data);
                 if (data_message.task == 'send_message')
-                {
+                {   
                     let div_time = document.createElement('div')
                     div_time.innerHTML = ParceDate(data_message.time);
-                    // console.log("==========> " + data_message.message);
                     if (data_message.status == "success")
                     {
+                        
                         let div_message = document.createElement('div');
                         div_message.innerHTML = data_message.message;
-                        // console.log(data_message.sender == username1);
                         let div_parent = document.createElement("div");
                         
                         if (data_message.sender == username1)
@@ -259,7 +360,7 @@ function create_chatRoom(map)
                         div_parent.append(div_message, div_time)
                         chat_div.append(div_parent);
                         index += div_message.clientHeight;
-                        index += 5;
+                        index += 8;
                         div_time.style.top = `${index}px`;
                         index += 10;
                     }
@@ -308,21 +409,22 @@ function create_chatRoom(map)
                         'message': chat_input.value,
                         'room_name' : room_name,
                         'action' : "",
+                        'user_id' : button.id,
                     }));
                     chat_input.value = "";
                 }
             })
-            // Web_socket.onerror()
+         
             chat_input.addEventListener('keyup', (e) => {
                 if (String(chat_input.value).length && e.key == 'Enter' && hasNonPrintableChars(chat_input.value) == true)
-                {
-                    console.log(hasNonPrintableChars(chat_input.value) + ' hhhhhhhhhhh ::' + chat_input.value)
+                {   
                     Web_socket.send(JSON.stringify({
                         'task' : 'send_message',
                         'sender' : username1,
                         'message': chat_input.value,
                         'room_name' : room_name,
                         'action' : '',
+                        'user_id' : button.id,
                     }));
                     chat_input.value = "";
                 }
@@ -330,7 +432,7 @@ function create_chatRoom(map)
             Web_socket.onclose = () =>{
                 console.log('the connection has been closed')
             }
-            console.log(map);
+            // console.log(map);
 
         })
     });
@@ -351,9 +453,12 @@ function create_chatRoom(map)
         }
     })
     div_info.addEventListener('click', () =>{
+        
         if (check == true){
             button_block.textContent = `${map_action[username2]} ${username2}`;
             button_info.textContent = `${username2}'s profile`;
+            button_game.textContent = `play with ${username2}`;
+            div_menu_child1.id = username2;
             chat_container.append(div_menu);
             check = false;
         }
@@ -393,17 +498,8 @@ function create_chatRoom(map)
                             'message': "",
                             'room_name' : room_name,
                             'action' : data.action,
+                            'user_id' : '',
                         }));
-                        // if (data.status == 'success' && data.action == 'unblock')
-                        // {
-                        //     map_action[username2] = 'block';
-                        //     console.log('11111111111111111user blocking you')
-                        // }
-                        // else if (data.status == 'success' && data.action == 'block')
-                        // {
-                        //     console.log('2222222222222222user blocking you')
-                        //     map_action[username2] = 'unblock';
-                        // }
                     })
                     .catch(error => {
                         console.error('Error when fetch csrf token :', error);
@@ -413,9 +509,7 @@ function create_chatRoom(map)
                 console.error('Error fetching CSRF token:', error);
             })     
     }
-    // div_bolck_msg.className = 'chat-block-user'
-    // div_bolck_msg.style.color = 'white';
-    button_block.addEventListener('click', do_action);
+    div_menu_child2.addEventListener('click', do_action);
 }
 
 

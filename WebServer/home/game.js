@@ -7,8 +7,12 @@ var ctx = NaN;
 var width = NaN;
 var height = NaN;
 var lastone = "undefinded"
+var game_starting = false;
+var tournament_starting = false;
+var tournament_active_section = 'tournament_list';
+var continue_game = false;
 
-function draw_ball(b)
+function    draw_ball(b)
 {
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
@@ -121,14 +125,24 @@ function draw(data)
 
 var first_time = true;
 
-function    disactiv_sections()
+function    disactiv_section(section_id)
 {
+    document.getElementById(section_id).classList.remove('active');
+}
+
+function    disactiv_sections()
+{    
+    document.getElementById("chat").style.display = 'none';
     document.getElementById("home").style.display = 'none';
     document.getElementById("profile").style.display = 'none';
     document.querySelector('.conteudo').style.display = 'none';
     document.querySelectorAll('section').forEach(section => {
         section.classList.remove('active');
     });
+}
+
+function    put_section(section_id){
+    document.getElementById(section_id).classList.add('active');
 }
 
 function    active_section(section_id)
@@ -150,10 +164,12 @@ function    display_ping_pong(data)
             lastone = data.players[i].login;
     }
     active_section('start_fight');
+    // put_section('start_fight');
 }
 
 function showResult(result)
 {
+    game_starting = false;
     const message = document.getElementById('resultMessage');
 
     if (result == 'Winner')
@@ -166,6 +182,7 @@ function showResult(result)
         message.textContent = 'Sorry You Lost!';
         message.style.color = 'red';
         document.getElementById('result-gif').src = "/home/resrc/game/lost.png";
+        game_socket.close(1000, 'Normal Closure');
     }
     active_section('resultModal');
 }
@@ -224,15 +241,21 @@ function    tournament_info(players, section_id)
 }
 
 document.addEventListener("keydown", (event) => {
-    if (event.key == "ArrowUp")
-        game_socket.send(JSON.stringify({'type':'move', 'move':'Up'}));
-    else if (event.key == "ArrowDown")
-        game_socket.send(JSON.stringify({'type':'move', 'move':'Down'}));
+    if (game_socket.readyState === WebSocket.OPEN)
+    {
+        if (event.key == "ArrowUp")
+            game_socket.send(JSON.stringify({'type':'move', 'move':'Up'}));
+        else if (event.key == "ArrowDown")
+            game_socket.send(JSON.stringify({'type':'move', 'move':'Down'}));
+    }
 });
 
 document.addEventListener("keyup", (event) => {
-    if (event.key == "ArrowUp" || event.key == "ArrowDown")
-        game_socket.send(JSON.stringify({'type':'move', 'move':'Stop'}));
+    if (game_socket.readyState === WebSocket.OPEN)
+    {
+        if (event.key == "ArrowUp" || event.key == "ArrowDown")
+            game_socket.send(JSON.stringify({'type':'move', 'move':'Stop'}));
+    }
 });
 
 function    tournament_list(data)
@@ -257,7 +280,7 @@ function    tournament_list(data)
         div.appendChild(span);
         parent.appendChild(div);
         });
-    active_section('tournament_list');
+    active_section('containerrrr');
     document.querySelector('.conteudo').style.display = 'flex';
 }
 
@@ -285,11 +308,24 @@ async function run(section_id, socket_url, canvas_id, type)
         {
             var data = JSON.parse(e.data)
             if (data.type == 'game.info')
+            {
+                // continue_game = false;
+                // const inter = setInterval(() => {
+                //     if (continue_game == false)
+                //     {
+                //         game_socket.close(1000, 'Normal Closure');
+                //         disactiv_section('start_fight');
+                //     }
+                //     clearInterval(interval);
+                // }, 10000);
                 display_ping_pong(data);
+            }
             else if (data.type == 'game.state')
             {
                 if (first_time)
                 {
+                    game_starting = true;
+                    first_time = false;
                     active_section(section_id)
                     // var countdown = 3;
                     // const interval = setInterval(() => {
@@ -307,6 +343,7 @@ async function run(section_id, socket_url, canvas_id, type)
             else if (data.type == 'tournament.info')
             {
                 tournament_info(data.players, 'play_tournament');
+                tournament_active_section = 'play_tournament';
                 first_time = true;
             }
             else if (data.type == 'game.end')
@@ -321,14 +358,45 @@ async function run(section_id, socket_url, canvas_id, type)
     }
 }
 
+function new_game(){
+    game_starting = false;
+    navigate('play');
+}
+
+function    close_game()
+{
+    border_home();
+    game_starting = false;
+    game_socket.close(1000, 'Normal Closure');
+}
+
+function new_tournament()
+{
+    tournament_starting = false;
+    navigate('tournament_input');
+}
+
+function    tournamet_active_section()
+{
+    active_section(tournament_active_section);
+    if (tournament_active_section == 'tournament_list')
+        document.querySelector('.conteudo').style.display = 'flex';
+}
+
 function navigate(section_id) {
     if (section_id == 'play')
     {
-        active_section('loading-section-id');
-        run('play', '/wss/game/', '2-canvas-id', {'type':'random', 'vs':'undefined'});
+        if (game_starting == false)
+        {
+            active_section('loading-section-id');
+            run('play', '/wss/game/', '2-canvas-id', {'type':'random', 'vs':'undefined'});
+        }
+        else
+            active_section('already_in_game_id');
     }
     else if (section_id == 'play_tournament')
     {
+        tournament_starting = true;
         active_section('tournament_list');
         run('play', '/wss/tournament/' , '2-canvas-id', {'type':'random', 'vs':'undefined'});
     }
@@ -339,11 +407,30 @@ function navigate(section_id) {
     }
     else if (section_id == 'tournament_input')
     {
-        disactiv_sections();
-        document.getElementById('tournament_input').style.display = 'flex';
+        if (tournament_starting == false)
+        {
+            disactiv_sections();
+            document.getElementById('tournament_input').style.display = 'flex';
+        }
+        else
+            active_section('already_in_tournament_id');
     }
     else
         active_section(section_id);
+}
+
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        // document.querySelector('.navbar').style.display = 'none';
+        // document.querySelector('.aside_content').style.display = 'none';
+        document.documentElement.requestFullscreen().catch((err) => {
+            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+    } else {
+        // document.querySelector('.navbar').style.display = 'flex';
+        // document.querySelector('.aside_content').style.display = 'flex';
+        document.exitFullscreen();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -384,5 +471,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('messages').innerHTML = error;
                 document.getElementById('messages').style.color = 'red';
             });
+        });
+        document.getElementById('toggle-btn').addEventListener('click', toggleFullScreen);
+        document.addEventListener('fullscreenchange', (event) => {
+            if (document.fullscreenElement) {
+                document.querySelector('.navbar').style.display = 'none';
+                document.querySelector('.aside_content').style.display = 'none';
+                document.querySelector('.game_nav').style.display = 'none';
+                document.querySelector('#screen_img').src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAItJREFUSEvlVEEOgCAMW3+mL9ef1YRIAigwMJsxcoOMdV23QowPjPOLLwDJTUSWyApAKIAkU6aV9x3AWnYkY6BMJD3grJj0EgFiAq0+rX+3DMwAtBWPxLlPUZgWsxZ9X+RZBi3RfUUeGT/tgvou2qwGw1bRctOa0V1c9HTiskVdu34EYC7yfwFe3eQDRrV9Ga6+/8IAAAAASUVORK5CYII="
+            } else {
+                document.querySelector('.navbar').style.display = 'flex';
+                document.querySelector('.aside_content').style.display = 'flex';
+                document.querySelector('.game_nav').style.display = 'flex';
+                document.querySelector('#screen_img').src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAGpJREFUSEvtVUEKACAIa/9/tNEhsDCYRUZg59k2dYVy+eDy/SWWQERk5QjAIIbFbhU1EUcEs1p2Tp1U15sOkuBdi9hhenCxQfMoY7GxDqygsEp1ut9tUTqgHztrsH/8B56VZLGxQWNVeXAV8rVwGd7+Wh0AAAAASUVORK5CYII="
+            }
         });
 });

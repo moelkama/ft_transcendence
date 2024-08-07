@@ -5,48 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ping-pong</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="game.css">
     <link rel="icon" href="icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.cdnfonts.com/css/games" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/soap-opera" rel="stylesheet">
+                
+
+    
 </head>
-<body>
+<body class="body">
+    <div class="brull"></div>
     <div class="ball"></div>
     <div class="ball2"></div>
     <nav class="navbar">
         <div class="fac_one">
         <div class="navbar-logo">
-            <a class="nav-link" data-target="home"><img src="./resrc/new-logo.png" alt="Logo" onclick="active_section('play')"></a>
+            <a class="logo" onclick="border_home()" data-target="home"><img src="./resrc/freecss-logo.png" alt="Logo" ></a>
+           
         </div>
-        <div class="nav-search">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="search-input" >
-            <div class="users-search-bar"></div>
         </div>
-    </div>
-        <div class="navbar-buttons">
-            <ul>
-                <li id="Home"><a  class="nav-link nav_hover" data-target="home" href="#home"  onclick="border_home()" onclick="disactiv_sections()">Home</a></li>
-                <li id="Pr" ><a class="nav-link nav_hover" data-target="profile" href="#profile" onclick="border_pr()" onclick="disactiv_sections()">Profile</a></li>
-                <li><div class="profil" id="imageprofile"></div></li>
-            </ul>
-        </div>
+            <div class="navbar-buttons">
+                <ul>
+                    <div class="nav-search">
+                        <i id="search-icon" class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" class="search-input" >
+                        <div class="users-search-bar"></div>
+                    </div>
+                    <li ><label id="nameprofile"></label> </li>               
+                    <li><div onclick="border_pr()" class="profil" id="imageprofile"></div></li>
+                    
+                </ul>
+                <li  class="mode dark" onclick="dark()"><i class="fa-solid fa-moon"></i></li>
+                <li  class="mode light" onclick="light()"><i class="fa-regular fa-moon"></i></li>
+            </div>
     </nav>
     <div class="container">
         <aside>
             <div class="aside_content">
-                <div class="image1">
+                
                     <ul>
-                        <!-- <li><a class="settings-button" onclick="showSettingsModal()"><div class="seting_icon"></div></a></li> -->
-                        <li><a class="notification aside"  onclick="showNotificationsModal()"><div    class="aside_button icons" class="icons"> <i class="fa-solid fa-bell"></i> </div></a></li>
-                        <li><a class="nav-link aside" data-target="chat"  onclick="click_chat()"><div  class="icons"  class="aside_button"><i class="fa-solid fa-comment"></i></div></a></li>
+                        <li ><a  data-target="home"   onclick="border_home()"  class="icons"  ><i id="Home-aside" class="fa-solid fa-house"></i></a></li>
+                         <li  ><a data-target="profile" onclick="border_pr()"  class="icons" ><i id="Pr-aside" class="fa-solid fa-user"></i></a></li>
+                        
+                        <li>
+                            <div class="chat-aside-numberMessage"></div>
+                            <a class="chat-aside nav-link aside"   onclick="click_chat()">
+                            <div  class="icons"  ><i id="chat-aside" class="fa-solid fa-comment"></i></div>
+                            </a>
+                        </li>
+                        <li><a class="notification aside"  onclick="showNotificationsModal()"><div    class="icons" > <i id="notif-aside" class="fa-solid fa-bell"></i> </div><div class="count-noti" id="count-noti"></div></a></li>
+                        
+                
+                        <li><a class="settings-button" onclick="showSettingsModal()"><div class="icons" ><i id="setting-aside" class="fa-solid fa-gear"></i></div></a></li>
+                        <li><a class="logout-button og_out_icon aside_button" onclick="showLogoutModal()"><div class="icons"><i id="logout-aside" class="fa-solid fa-right-from-bracket"></i></div></a></li>
                     </ul>
-                </div>
-                <div class="image2">
-                    <ul>
-                        <li><a class="settings-button" onclick="showSettingsModal()"><div class="icons" ><i class="fa-solid fa-gear"></i></div></a></li>
-                        <li><a class="logout-button og_out_icon aside_button" onclick="showLogoutModal()"><div class="icons"><i class="fa-solid fa-right-from-bracket"></i></div></a></li>
-                    </ul>
-                </div>
+                
             </div>
         </aside>
         <article>
@@ -56,13 +70,13 @@
                 <div class="images">
 
                     <div class="welcome_home">
-                        <h1>Welcome to Ping Pong</h1>
-                        <h1>Choose a game mode</h1>
+                        <h1> <span class="span"> Welcome</span> to <span class="span"> Ping </span> Pong</h1>
+                        <h1> Choose <span class="span">a</span> game  <span class="span">mode</span></h1>
                     </div>
                     <div class="play">
                     <div class="game">
                            
-                            <button class="home_button" onclick="navigate('play')" >Start game</button>
+                            <button class="home_button" onclick="navigate('play')" >play game</button>
                         </div>
                         <div class="game">
                             
@@ -119,20 +133,34 @@
                 </div>
             </div>
             <div id="chat" class="content-section aside-co">
+                
                 <div>
                     <h1 class="game_title">
-                        Game Chat Hup
+                        <span class="span">Game</span> Chat  <span class="span">Hub</span>
                     </h1>
 
                 </div>
+                <div class="container-chat">
+                    <div class="friend-list">
+                        <h2>Friends</h2>
+                        <ul id="friends">
+                            <div class="list_friend" id="list_friend_chat">
+                                <!-- <button class="friend-list-room">adddd</button> -->
+                            </div>
+                        </ul>
+                    </div>
                 <div class="chat-container">
+                    
                     <div id="chat-header" class="chat-header">
-                        <div class="image-chat" id="image-chat"></div>
-                        <h2 id="chat-friend-name">Select a friend to chat</h2>
+                        <div class="image-chat" id="image-chat">
+                            
+                        </div>
+                        <h2 id="chat-friend-name"><span class="span">Select</span> a friend to <span class="span">chat</span></h2>
                         
                     </div>
                     
                         <div id="chat-messages" class="chat-messages">
+
                         </div>
                         <div class="chat-input">
                             <input type="text" id="message-input" placeholder="Type a message...">
@@ -141,15 +169,10 @@
                         
                     
                 </div>
-                <div class="friend-list">
-                    <h2>Friends</h2>
-                    <ul id="friends">
-                        <div class="list_friend" id="list_friend_chat">
-                            <!-- <button class="friend-list-room">adddd</button> -->
-                        </div>
-                    </ul>
-
-                </div>
+                    
+            </div>
+                
+                
                 
                 
             </div>
@@ -179,40 +202,52 @@
                 
                 <div id="settings-modal" class="settings-modal">
                     <div class="setting-contiener">
-                        <span class="close_set" onclick="closeSettingsModal()">&times;</span>
+                        <!-- <span class="close_set" onclick="closeSettingsModal()">&times;</span> -->
+                            <div class="menu">
+                                <div class="menu-item1" onclick="openTab(event, 'profile-data')">Profile data</div>
+                                <div class="menu-item2" onclick="openTab(event, 'profile-password')">Profile password</div>
+                                <div class="menu-item3" onclick="delete_funcyion()">dellet account</div>
+                                <div class="menu-item4" onclick="showLogoutModal()">Quit</div>
+                                <div class="menu-item5" onclick="closeSettingsModal()">close window</div>
+                            </div>
                             
-                            <div class="forms">
-                                    <form id="avatarForm" class="form-container" method="post" enctype="multipart/form-data" action="/update_profile/">
-                                        <h3 class="h3_setting">Change profile data</h3>
-                                                <div class="profil setting_profile" id="profil">
-                                                    <img class="edit" src="./resrc/edit.png" alt="">
-                                                </div>
-                                                    <label id="nameprofile" for="username">Edit Avatar</label>
+                                <div class="personil-data">
+                                    <form class="profile_photo_form" method="post" enctype="multipart/form-data">
+                                        <input type="hidden" name="csrfmiddlewaretoken" id="crcf_profileuser">
+                                        <div class="profil setting_profile" id="profil">
+                                            <img class="edit" src="./resrc/edit.png" alt="">
+                                        </div>
+                                        <input type="file" id="image" name="image" accept="image/*" style="display: none;">
+                                        <button type="submit" id="button_profile_click" style="display: none;"></button>
+                                    </form>
+                                    <!-- <label id="nameprofile" class="user-name" for="username"></label> -->
+                                    <form id="avatarForm" class="form-container-pofile" method="post" enctype="multipart/form-data">
+                                        
                                                 <input type="hidden" name="csrfmiddlewaretoken" id="crcf">
-                                                <input type="file" id="image" name="image" accept="image/*" style="display: none;">
-                                                <input type="text" id="username" name="username" placeholder="New UserName"  minlength="8" required>
-                                                <input type="text" id="first_name" name="first_name" placeholder="New First Name"  minlength="8" required>
-                                                <input type="text" id="last_name" name="last_name" placeholder="New Last Name"  minlength="8" required >
-                                                <input type="email" id="email" name="email" placeholder="New Email"  minlength="8" required>
+                                                <input type="text" id="username" name="username" placeholder="New UserName"  maxlength="7"  required>
+                                                <input type="text" id="first_name" name="first_name" placeholder="New First Name"   required>
+                                                <input type="text" id="last_name" name="last_name" placeholder="New Last Name"   required >
+                                                <input type="email" id="email" name="email" placeholder="New Email"   required>
                                                 <div id="messages"></div>
                                                 <br>
                                         <button class="submit" type="submit">SAVE</button>
                                     </form>
-                                    <form id="passwordForm" class="form-container" method="post" enctype="multipart/form-data" action="/change_password/">
+                                </div>
+                                    <form id="passwordForm" class="form-container-pass" method="post" enctype="multipart/form-data" action="/change_password/">
                                         <div class="center-h3">
-                                            <h3 class="h3_setting">Change profile password</h3>
+                                            <h3 class="h3_setting">You can change your password if you have password.</h3>
                                         </div>
                                         <input type="hidden" name="csrfmiddlewaretoken" id="crcf2">
                                         <input type="password" id="old_password" name="old_password" placeholder="Old password" minlength="12" required >
                                         <input type="password" id="new_password" name="new_password" placeholder="New password"  minlength="12" required>
                                         <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password">
                                         <div id="messages1"></div> 
-                                        <br>
-                                        <button class="submit" type="submit">SAVE</button>
-                                        <br>
-                                        <a class="delet_account" onclick="delete_funcyion()">Delete Acount</a>
+                                        
+                                        <button class="submit isintra" type="submit">SAVE</button>
+                                        
+                                        <!-- <a class="delet_account" onclick="delete_funcyion()">Delete Acount</a> -->
                                     </form>
-                            </div>
+                            
                     </div>
                         
                 </div>
@@ -229,7 +264,7 @@
                     <div class="profile-user">
                         <div class="profile-user-info">
                             <div class="image_user">
-                                <span class="close_profile" onclick="close_user_profile()">&times;</span>
+                                <span class="close_profile" >&times;</span>
                                 <img class="profile-user-photo_profile" src="" alt="">
                                 <span class="profile-user-status">
                                     <p class="profile-user-status-color"></p>
@@ -249,6 +284,12 @@
                                 <h2 class="profile-user-info-rank"></h2>
                             </div>
                         </div>
+                        <div class="profile-user-action">
+                            <button class="profile-user-action-add_friend">Add friend</button>
+                            <button class="profile-user-action-unfriend">Unfriend</button>
+                            <button class="profile-user-action-go_to_chat">Go to chat</button>
+                            <div class="profile-user-action-message"></div>
+                        </div>
                         <div class="profile-user-body">
                             <div class="profile-user-more_info">
                                 
@@ -265,25 +306,39 @@
                                 <div class="profile-user-dateCreationAccount"></div>
                                 <hr>
                             </div>
-                            <div class="profile-user-statistique">
-                                <span class="statistique-header">
-                                    <i class="fa-solid fa-chart-pie"></i>
-                                    <span>User statistiques</span>
-                                </span>
-                                <div class="no-statistique">
-                                    This player has no statistiques yet
+                            <div>
+                                <div class="select-option-profile">
+`                                   <span class="statistique-header">
+                                        <i class="fa-solid fa-chart-pie"></i>
+                                        <span>statistiques</span>
+                                    </span>
+                                    <span class="history-header">
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                        <span >history Match</span>
+                                    </span>
                                 </div>
-                                <div class="number-win"></div>
-                                <div class="number-lose"></div>
-                                <div class="circle"></div>
-                                <div class="number-statistique">
-                                    <div class="win-statistique-div">Win
-                                        <span class="win-statistique">
-                                        </span>
+                                <div class="profile-user-statistique">
+                                    
+                                    <div class="no-statistique">
+                                        This player has no statistiques yet
                                     </div>
-                                    <div class="lose-statistique-div">Lose
-                                        <span class="lose-statistique">
-                                        </span>
+                                    <div class="number-win"></div>
+                                    <div class="number-lose"></div>
+                                    <div class="circle"></div>
+                                    <div class="number-statistique">
+                                        <div class="win-statistique-div">Win
+                                            <span class="win-statistique">
+                                            </span>
+                                        </div>
+                                        <div class="lose-statistique-div">Lose
+                                            <span class="lose-statistique">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="profile-user-history-match">
+                                    <div class="no-history">
+                                        this Player has no history yet
                                     </div>
                                 </div>
                             </div>
@@ -297,18 +352,25 @@
                     </div>
                 </section>
                 <section id="play">
-                    <div id="ping-pong-2" class="ping-pong">
-                        <div class="users">
-                            <div class="user1">
-                                <img id="2-canvas-icon-id-0" class="icon">
-                                <h2 id="2-canvas-display_name-id-0" class="display-name"></h2>
-                            </div>
-                            <div class="user2">
-                                <h2 id="2-canvas-display_name-id-1" class="display-name"></h2>
-                                <img id="2-canvas-icon-id-1" class="icon">
-                            </div>
+                    <div class="flex-column">
+                        <div class="game_nav">
+                            <button o id="toggle-btn">
+                                <img id="screen_img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAGpJREFUSEvtVUEKACAIa/9/tNEhsDCYRUZg59k2dYVy+eDy/SWWQERk5QjAIIbFbhU1EUcEs1p2Tp1U15sOkuBdi9hhenCxQfMoY7GxDqygsEp1ut9tUTqgHztrsH/8B56VZLGxQWNVeXAV8rVwGd7+Wh0AAAAASUVORK5CYII="/>                            </button>
+                            <span onclick="put_section('Give_Up_Game')" class="close_game">&times;</span>
                         </div>
-                        <canvas id="2-canvas-id" class="canvas" width="600px" height="300px"></canvas>
+                        <div id="ping-pong-2" class="ping-pong">
+                            <div class="users">
+                                <div class="user1">
+                                    <img id="2-canvas-icon-id-0" class="icon">
+                                    <h2 id="2-canvas-display_name-id-0" class="display-name">akatfi</h2>
+                                </div>
+                                <div class="user2">
+                                    <h2 id="2-canvas-display_name-id-1" class="display-name">moelkama</h2>
+                                    <img id="2-canvas-icon-id-1" class="icon">
+                                </div>
+                            </div>
+                            <canvas id="2-canvas-id" class="canvas" width="600px" height="300px"></canvas>
+                        </div>
                     </div>
                 </section>
                 <section id="resultModal" class="result_class">
@@ -329,13 +391,13 @@
                         <h1 class="game_notification_msg">Game Refused by</h1>
                         <div class="con">
                             <img id="game_refuse_icon_id">
-                        </div> 
+                        </div>
                         <h1 id="game_refuse_username_id"></h1>
                     </div>
-                    <div class="buttonss">
+                    <!-- <div class="buttonss">
                         <button class="Retry_button" onclick="navigate('play')">Play Random</button>
                         <button class="Home_button" onclick="closeModal('refuse_game_id')">Home</button>
-                    </div>
+                    </div> -->
                 </section>
                 <section id="play-4" >
                     <div class="ping-pong">
@@ -370,47 +432,72 @@
                     <button type="submit" class="buttonn">Start</button>
                 </form>
             </section>
-            <section id="play_tournament">
-                <div id="tournament-id" class="tournament">
-                    <div class="round">
-                        <div class="matchup">
-                            <div id="00" class="player"></div>
-                            <div id="01" class="player"></div>
-                        </div>
-                        <div class="matchup">
-                            <div id="02" class="player"></div>
-                            <div id="03" class="player"></div>
-                        </div>
-                        <div class="matchup">
-                            <div id="04" class="player"></div>
-                            <div id="05" class="player"></div>
-                        </div>
-                        <div class="matchup">
-                            <div id="06" class="player"></div>
-                            <div id="07" class="player"></div>
-                        </div>
-                        </div>
-                        <div class="round">
-                            <div class="matchup">
-                                <div id="10" class="player"></div>
-                                <div id="11" class="player"></div>
+            <section id="containerrrr">
+                <nav class="tournament_nav">
+                    <button class="tournament_nav_button" onclick="put_section('tournament_list')">List</button>
+                    <button class="tournament_nav_button" onclick="put_section('Match_making')">Match making</button>
+                    <!-- <button class="tournament_nav_button" onclick="put_section('tournament_game_id')">Game</button>
+                    <button class="tournament_nav_button" onclick="put_section('List')">Give Up</button> -->
+                </nav>
+                <div class="tournament_sections">
+                    <section id="tournament_list">
+                        <!-- <div class="conteudo">
+                            <div id="tournament_content" class="caixa">
                             </div>
-                            <div class="matchup">
-                                <div id="12" class="player"></div>
-                                <div id="13" class="player"></div>
-                            </div>
-                        </div>
-                        <div class="round">
-                            <div class="matchup">
-                                <div id="20" class="player"></div>
-                                <div id="21" class="player"></div>
-                            </div>
-                        </div>
-                        <div class="champion">
-                            <div id="30" class="player"></div>
-                        </div>
-                    </div>
-                </section>
+                        </div> -->
+                        <h1>tournament</h1>
+                    </section>
+                    <section id="play_tournament">
+                        <h1>tournament match making</h1>
+                        <!-- <section id="play_tournament">
+                            <div id="tournament-id" class="tournament">
+                                <div class="round">
+                                    <div class="matchup">
+                                        <div id="00" class="player"></div>
+                                        <div id="01" class="player"></div>
+                                    </div>
+                                    <div class="matchup">
+                                        <div id="02" class="player"></div>
+                                        <div id="03" class="player"></div>
+                                    </div>
+                                    <div class="matchup">
+                                        <div id="04" class="player"></div>
+                                        <div id="05" class="player"></div>
+                                    </div>
+                                    <div class="matchup">
+                                        <div id="06" class="player"></div>
+                                        <div id="07" class="player"></div>
+                                    </div>
+                                    </div>
+                                    <div class="round">
+                                        <div class="matchup">
+                                            <div id="10" class="player"></div>
+                                            <div id="11" class="player"></div>
+                                        </div>
+                                        <div class="matchup">
+                                            <div id="12" class="player"></div>
+                                            <div id="13" class="player"></div>
+                                        </div>
+                                    </div>
+                                    <div class="round">
+                                        <div class="matchup">
+                                            <div id="20" class="player"></div>
+                                            <div id="21" class="player"></div>
+                                        </div>
+                                    </div>
+                                    <div class="round">
+                                        <div class="champion">
+                                            <div id="30" class="player"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section> -->
+                    </section>
+                    <section id="tournament_game_id">
+                        <h1>Game</h1>
+                    </section>
+                </div>
+            </section>
                 <section id="win-tournament-id">
                     <div class="msg_img_t">
                         <h1 class="result_msg">Congration You are the champion!</h1>
@@ -424,12 +511,6 @@
                         <button class="Home_button" onclick="closeModal('resultModal')">Home</button>
                     </div>
                 </section>
-                <section id="tournament_list">
-                    <div class="conteudo">
-                        <div id="tournament_content" class="caixa">
-                        </div>
-                    </div>
-                </section>
                 <section id="game_notification_id" class="game_notification">
                     <img id="game_notification_icon_id" class="icon">
                     <h2 id="game_notification_username_id" class="display-name"></h2>
@@ -439,42 +520,80 @@
                         <button class="Give_Up" id="refuseBtn_play" onclick="refuse_game()">Refuse</button>
                     </div>
                 </section>
-                <section class="par" id="start_fight">
-                    <div class="fighters">
-                      <div class="fighter1" id="fighter1">
-                        <h1 id="fighter_username_0"></h1>
-                        <img id="fighter_icon_0" class="icon">
-                      </div>
-                      <div class="vs">vs</div>
-                      <div class="fighter2">
-                        <img id="fighter_icon_1" class="icon">
-                        <h1 id="fighter_username_1"></h1>
-                      </div>
-                    </div>
-                    <div class="fighters_bottuns">
-                      <button class="Continue" onclick="Continue_game('Continue')">Continue</button>
-                      <button class="Give_Up" onclick="Continue_game('Give_Up')">Give Up</button>
+
+                <section id="start_fight">
+                    <div class="already_in_game_class">
+                        <div class="time_out_par">
+                            <div class="fighters">
+                                <div class="fighter1" id="fighter1">
+                                    <h1 id="fighter_username_0"></h1>
+                                    <img id="fighter_icon_0" class="icon">
+                                </div>
+                                <div class="vs">vs</div>
+                                <div class="fighter2">
+                                    <img id="fighter_icon_1" class="icon">
+                                    <h1 id="fighter_username_1"></h1>
+                                </div>
+                            </div>
+                            <div class="time_out_class"></div>
+                        </div>
+                        <div class="fighters_bottuns">
+                            <button class="Continue" onclick="Continue_game('Continue')">Continue</button>
+                            <button class="Give_Up" onclick="Continue_game('Give_Up')">Give Up</button>
+                        </div>
                     </div>
                 </section>
-        </article>
-       
+                <section id="already_in_game_id">
+                    <div class="already_in_game_class">
+                        <h1 style="color: #ff9800">You are already in a game</h1>
+                        <h3 style="color: red">if you chose to play new Game, automaticly you lose the previuse one</h2>
+                        <div class="buttonss">
+                            <button class="Continue" onclick="active_section('play')">Continue</button>
+                            <button class="Continue" onclick="new_game('play')">New</button>
+                        </div>
+                    </div>
+                </section>
+                <section id="already_in_tournament_id">
+                    <div class="already_in_game_class">
+                        <h1 style="color: #ff9800">You are already in a Tournament</h1>
+                        <h3 style="color: red">if you chose to play new Tournament, automaticly you lose the previuse one</h2>
+                        <div class="buttonss">
+                            <button class="Continue" onclick="tournamet_active_section()">Continue</button>
+                            <button class="Continue" onclick="new_tournament()">New</button>
+                        </div>
+                    </div>
+                </section>
+                <section id="Give_Up_Game">
+                    <div class="Give_Up_Game_class">
+                        <div class="already_in_game_class">
+                            <h2 style="color: #ff9800">Are you shure you want to Giv Up from the Game?<h2>
+                            <h3 style="color: red">automaticly you are lose</h3>
+                            <div class="buttonss">
+                                <button class="Give_Up" onclick="close_game()">Shure</button>
+                                <button class="Continue" onclick="disactiv_section('Give_Up_Game')">Stay</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </article>
     </div>
     <script src="game.js"></script>
     <script src="script.js"></script>
-    <script src="match.js"></script>
-    <script src="leader.js"></script>
-    <script src="data.js"></script>
-    <script src="token.js"></script>
+    <script type="module" src="match.js"></script>
+    <script type="module" src="leader.js"></script>
+    <script type="module" src="data.js"></script>
+    <script  type="module" src="token.js"></script>
     <script type="module" src="suggest.js"></script>
     <script  type="module" src="invite.js"></script>
     <script type="module" src="challenge.js"></script>
     <script type="module" src="notif.js"></script> 
     <script src="setting.js"></script>
-    <script src="userInformation.js"></script>
-    <script src="msgfriend.js" type="module"></script>
-    <script src="chatScript.js" type="module"></script>
-    <script src="track.js"></script>
-    <script src="search.js"></script>
+    <script type="module" src="userInformation.js" defer></script>
+    <script type="module" src="msgfriend.js" ></script>
+    <script type="module" src="chatScript.js" ></script>
+    <script type="module" src="track.js"></script>
+    <script type="module" src="search.js"></script>
+    <script type="module" src="ProfileAction.js"></script>
 
 </body>
 </html>
