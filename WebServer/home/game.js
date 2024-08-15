@@ -76,9 +76,10 @@ async function get_url(socket_url) {
 
 function challenge_lastone()
 {
-    main_socket.send(JSON.stringify({'type':'room.create', 'vs':lastone}));
-    active_section('loading-section-id');
-    run('play', '/wss/game/', '2-canvas-id', {'type':'room', 'room_creater':document.getElementById('login').textContent});
+    challenge_friend(lastone);
+    // main_socket.send(JSON.stringify({'type':'room.create', 'vs':lastone}));
+    // active_section('loading-section-id');
+    // run('play', '/wss/game/', '2-canvas-id', {'type':'room', 'room_creater':document.getElementById('login').textContent});
 }
 
 function challenge_friend(username)
@@ -131,7 +132,7 @@ function    disactiv_section(section_id)
 }
 
 function    disactiv_sections()
-{    
+{
     document.getElementById("chat").style.display = 'none';
     document.getElementById("home").style.display = 'none';
     document.getElementById("profile").style.display = 'none';
@@ -143,12 +144,14 @@ function    disactiv_sections()
 
 function    put_section(section_id){
     document.getElementById(section_id).classList.add('active');
+    if (section_id == 'tournament_list')
+        document.querySelector('.conteudo').style.display = 'flex';
 }
 
 function    active_section(section_id)
 {
     disactiv_sections();
-    document.getElementById(section_id).classList.add('active');
+    put_section(section_id);
 }
 
 function    display_ping_pong(data)
@@ -164,12 +167,12 @@ function    display_ping_pong(data)
             lastone = data.players[i].login;
     }
     active_section('start_fight');
-    // put_section('start_fight');
 }
 
 function showResult(result)
 {
     game_starting = false;
+    document.getElementById("game_aside_id").style.display = 'none';
     const message = document.getElementById('resultMessage');
 
     if (result == 'Winner')
@@ -213,7 +216,6 @@ function    refuse_game()
 }
 
 function closeModal(id) {
-    // document.getElementById(id).classList.remove('active');
     disactiv_sections();
     document.getElementById("home").style.display = 'flex';
 }
@@ -226,10 +228,9 @@ function    tournament_info(players, section_id)
     {
         var container = document.getElementById(round.toString() + i.toString());
         var icon = document.createElement("img");
-        icon.className = "icon";
+        icon.className = "Match_icon";
         icon.src = '/' + players[i].icon;
 
-        // icon.src = players[i].icon
         var display_name = document.createElement("h2");
         display_name.id = "user-display-name"
         display_name.textContent = players[i].login;
@@ -280,8 +281,7 @@ function    tournament_list(data)
         div.appendChild(span);
         parent.appendChild(div);
         });
-    active_section('containerrrr');
-    document.querySelector('.conteudo').style.display = 'flex';
+    tst('tournament_list');
 }
 
 async function run(section_id, socket_url, canvas_id, type)
@@ -308,25 +308,15 @@ async function run(section_id, socket_url, canvas_id, type)
         {
             var data = JSON.parse(e.data)
             if (data.type == 'game.info')
-            {
-                // continue_game = false;
-                // const inter = setInterval(() => {
-                //     if (continue_game == false)
-                //     {
-                //         game_socket.close(1000, 'Normal Closure');
-                //         disactiv_section('start_fight');
-                //     }
-                //     clearInterval(interval);
-                // }, 10000);
                 display_ping_pong(data);
-            }
             else if (data.type == 'game.state')
             {
                 if (first_time)
                 {
                     game_starting = true;
+                    game_asid(false);
+                    // active_section(section_id);
                     first_time = false;
-                    active_section(section_id)
                     // var countdown = 3;
                     // const interval = setInterval(() => {
                     //     ctx.clearRect(0, 0, width, height);
@@ -343,13 +333,17 @@ async function run(section_id, socket_url, canvas_id, type)
             else if (data.type == 'tournament.info')
             {
                 tournament_info(data.players, 'play_tournament');
-                tournament_active_section = 'play_tournament';
+                tournament_asid(false);
+                tst('play_tournament');
                 first_time = true;
             }
             else if (data.type == 'game.end')
                 showResult(data.result);
             else if (data.type == 'tournament.end')
+            {
+                document.getElementById("tournament_aside_id").style.display = 'block';
                 active_section('win-tournament-id');
+            }
         }
     }
     catch (error)
@@ -358,46 +352,66 @@ async function run(section_id, socket_url, canvas_id, type)
     }
 }
 
-function new_game(){
-    game_starting = false;
-    navigate('play');
-}
-
-function    close_game()
+function    close_game(return_to_home = true)
 {
-    border_home();
+    document.getElementById("game_aside_id").style.display = 'none';
+    document.getElementById("tournament_aside_id").style.display = 'none';
+    if (return_to_home)
+        border_home();
     game_starting = false;
     game_socket.close(1000, 'Normal Closure');
 }
 
-function new_tournament()
-{
+function new_game(){
+    close_game(false);
     tournament_starting = false;
-    navigate('tournament_input');
+    if (tournament_starting)
+        navigate('tournament_input');
+    else
+        navigate('play');
 }
 
-function    tournamet_active_section()
+function    close_tournament()
 {
-    active_section(tournament_active_section);
-    if (tournament_active_section == 'tournament_list')
-        document.querySelector('.conteudo').style.display = 'flex';
+    close_game();
+    tournament_starting = false;
 }
+
+function new_tournament()
+{
+    var n = game_starting;
+    close_game();
+    if (n)
+        navigate('play');
+    else
+        navigate('tournament_input');
+}
+
+// function    tournamet_active_section()
+// {
+//     active_section(tournament_active_section);
+//     // if (tournament_active_section == 'tournament_list')
+//     //     document.querySelector('.conteudo').style.display = 'flex';
+// }
 
 function navigate(section_id) {
     if (section_id == 'play')
     {
-        if (game_starting == false)
+        if (tournament_starting)
+            active_section('already_in_tournament_id');
+        else if (game_starting)
+            active_section('already_in_game_id');
+        else
         {
-            active_section('loading-section-id');
+            game_asid(false);
             run('play', '/wss/game/', '2-canvas-id', {'type':'random', 'vs':'undefined'});
         }
-        else
-            active_section('already_in_game_id');
     }
     else if (section_id == 'play_tournament')
     {
         tournament_starting = true;
-        active_section('tournament_list');
+        document.getElementById("tournament_aside_id").style.display = 'block';
+        tournament_asid(false);
         run('play', '/wss/tournament/' , '2-canvas-id', {'type':'random', 'vs':'undefined'});
     }
     else if (section_id == 'ping-pong-4')
@@ -407,36 +421,27 @@ function navigate(section_id) {
     }
     else if (section_id == 'tournament_input')
     {
-        if (tournament_starting == false)
-        {
-            disactiv_sections();
-            document.getElementById('tournament_input').style.display = 'flex';
-        }
-        else
+        if (tournament_starting)
             active_section('already_in_tournament_id');
+        else if (game_starting)
+            active_section('already_in_game_id');
+        else
+            tournament_asid(false);
     }
     else
         active_section(section_id);
 }
 
 function toggleFullScreen() {
-    if (!document.fullscreenElement) {
-        // document.querySelector('.navbar').style.display = 'none';
-        // document.querySelector('.aside_content').style.display = 'none';
+    if (!document.fullscreenElement)
         document.documentElement.requestFullscreen().catch((err) => {
             alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
         });
-    } else {
-        // document.querySelector('.navbar').style.display = 'flex';
-        // document.querySelector('.aside_content').style.display = 'flex';
+    else
         document.exitFullscreen();
-    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-        // disactiv_sections();
-        // document.getElementById('start_fight').style.display = 'block';
-        // history.replaceState(null, '', '/');
         (function get_csrf_token(){
             fetch('/api/csrf-token/')
             .then(response => response.json())
@@ -487,3 +492,76 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 });
+
+function    tst(section_id)
+{
+    document.getElementById('tournament_list').style.display = 'none';
+    document.getElementById('play_tournament').style.display = 'none';
+    document.querySelector('.conteudo').style.display = 'none';
+    document.getElementById(section_id).style.display = 'flex';
+    document.getElementById('tournament_nav_list_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('tournament_nav_making_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    if (section_id == 'tournament_list')
+    {
+        document.getElementById('tournament_nav_list_item_id').style.cssText = 'font-size: 40px; color: #ff44e4; ';
+        document.querySelector('.conteudo').style.display = 'flex';
+    }
+    else
+        document.getElementById('tournament_nav_making_item_id').style.cssText = 'font-size: 40px; color: #ff44e4; ';
+}
+
+// function tst1()
+// {
+//     document.getElementById('home').style.display = 'none';
+//     // document.querySelector('.navbar').style.display = 'none';
+//     document.getElementById('tournament_list').classList.add('active');
+//     document.getElementById('tournament_nav_id').classList.add('active');
+//     document.querySelector('.conteudo').style.display = 'flex';
+// }
+
+function game_asid(pushState = true) {
+    disactiv_sections();
+    // document.getElementById('Pr-aside').style.borderBottom = '2px solid #bbb';
+
+    if (pushState) {
+        window.history.pushState({page: 'game'}, 'Game', '?page=game');
+    }
+    document.getElementById('Home-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('Pr-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('game-aside').style.cssText = 'font-size: 40px; color: #ff44e4; ';
+    document.getElementById('chat-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('notif-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('setting-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('logout-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    ///////////////////
+    document.getElementById('tournament-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById("game_aside_id").style.display = 'block';
+    if (game_starting)
+        active_section('play');
+    else
+        active_section('loading-section-id');
+}
+
+function tournament_asid(pushState = true) {
+    disactiv_sections();
+    if (pushState) {
+    window.history.pushState({page: 'profile'}, 'Profile', '?page=profile');
+    }
+    document.getElementById('Home-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('Pr-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('tournament-aside').style.cssText = 'font-size: 40px; color: #ff44e4; ';
+    document.getElementById('chat-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('notif-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('setting-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('logout-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    ///////////////////
+    document.getElementById('game-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById("tournament_aside_id").style.display = 'block';
+    if (tournament_starting)
+    {
+        active_section('tournament_nav_id');
+        tst('tournament_list');
+    }
+    else
+        document.getElementById('tournament_input').style.display = 'flex';
+}

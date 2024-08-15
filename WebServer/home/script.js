@@ -83,7 +83,9 @@ function border_home(pushState = true) {
   document.getElementById('notif-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
   document.getElementById('setting-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
   document.getElementById('logout-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
-
+    ///////////////////
+    document.getElementById('tournament-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('game-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
 }
 
 function border_pr(pushState = true) {
@@ -100,13 +102,15 @@ function border_pr(pushState = true) {
   document.getElementById('Home-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
   document.getElementById('Pr-aside').style.cssText = 'font-size: 40px; color: #ff44e4; ';
   document.getElementById('chat-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
-
+  
   document.getElementById('notif-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
   document.getElementById('setting-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
   document.getElementById('logout-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
   
-
-
+  
+  ///////////////////
+  document.getElementById('tournament-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+  document.getElementById('game-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
 }
 
 function click_chat(pushState = true) {
@@ -125,6 +129,9 @@ function click_chat(pushState = true) {
   document.getElementById('notif-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
   document.getElementById('setting-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
   document.getElementById('logout-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    ///////////////////
+    document.getElementById('tournament-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('game-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
 
 }
   let currentFriend = null;

@@ -58,7 +58,8 @@ button {
 }
 
 .canvas{
-    border: 3px solid #ffff;
+    border-top: 3px solid #ffff;
+    border-bottom: 3px solid #ffff;
     background-color: black;
     box-shadow: white 1px 1px 20px;
 }
@@ -74,7 +75,6 @@ button {
 }
 
 .user2{
-    /* background-color: yellow; */
     display: flex;
     align-items: center;
     margin-left: auto;
@@ -89,6 +89,12 @@ button {
     height: 50px;
     width: 50px;
     border-radius: 25px;
+}
+
+.Match_icon{
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
 }
 
 .flex-column{
@@ -118,44 +124,57 @@ button {
     cursor: pointer;
 }
 
+#play_tournament{
+    height: 90%;
+}
+
 .tournament {
+    height: 100%;
+    width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
-    flex-direction: row;
-    width: inherit;
-    min-width: 800px;
-    position: absolute;
-    top: 120px;
-    left: 150px;
 }
 
 .round {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    min-width: 200px;
+    justify-content: space-evenly;
     width: 200px;
-    height: 800px;
+    height: 100%;
     margin: 0 40px;
     opacity: 0;
-    animation: fadeIn 2s forwards;
+    animation: fadeIn 1s forwards;
 }
 
 .round:nth-child(1) {
-    animation-delay: 0.4s;
+    animation-delay: .4s;
 }
 
 .round:nth-child(2) {
     animation-delay: 1s;
 }
 
-.round:nth-child(3) {
-    animation-delay: 1.4s;
+.final_round{
+    height: 60px;
+    display: flex;
+    justify-content: space-evenly;
+    opacity: 0;
+    animation: ftt 5s forwards;
+}
+
+@keyframes ftt {
+    to{
+        opacity: 1;
+    }
 }
 
 .round:nth-child(4) {
-    animation-delay: 1.8s;
+    animation-delay: 1s;
+}
+
+.round:nth-child(5) {
+    animation-delay: .4s;
 }
 
 @keyframes fadeIn {
@@ -167,20 +186,18 @@ button {
 .matchup {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 140px;
-    margin: 10px 0;
+    height: 120px;
 }
 
 .player {
     border: 1px solid #000;
     background-color: #8c8c8c;
-    padding: 10px;
+    padding: 5px;
     border-radius: 20px;
-    text-align: center;
     height: inherit;
-    align-items: center;
     display: flex;
+    align-items: center;
+    justify-content: space-around;
 }
 
 .champion {
@@ -315,25 +332,16 @@ section.active {
     color: #333;
 }
 
-#tournament_sections{
-    /* height: 100%;
-    width: 100%; */
-    background-color: yellow;
-}
-
 #tournament_list
 {
-    width: 100%;
-    height: 100%;
+    height: 90%;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* position: absolute;
-    top: 50%;
-    left: 50%; */
 }
 
 .tournament-input {
+    height: 100%;
     justify-content: center;
     align-items: center;
     /* position: absolute;
@@ -362,6 +370,7 @@ section.active {
 }
 
 .tournament-input-form .buttonn {
+    width: 80%;
     padding: 10px;
     border: none;
     border-radius: 5px;
@@ -382,14 +391,10 @@ section.active {
         rgb(255, 45, 83);
 }
 
-/* body {
-    background-color: #212123;
-} */
-
 .conteudo {
     box-sizing: border-box;
-    position: absolute;
     background: linear-gradient(to right, var(--cores-dancantes));
+    background-color: green;
     width: 250px;
     height: auto;
     border-radius: 10px;
@@ -465,7 +470,6 @@ section.active {
 }
 
 #already_in_game_id{
-    background-color: yellow;
     width: 100vw;
     height: 100vh;
 }
@@ -662,16 +666,20 @@ align_items_center{
 }
 .tournament_nav {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
+    align-items: center;
+    height: 80px;
     width: 100%;
-    background-color: #333;
+    border: 3px solid #ffffff1d;
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
     color: white;
     padding: 10px 0;
 }
 section {
     display: none;
 }
-.tournament_nav_button {
+/* .tournament_nav_button {
     background-color: transparent;
     font-size: 16px;
     font-weight: 700;
@@ -682,5 +690,34 @@ section {
 }
 .tournament_nav_button:hover , .tournament_nav_button.clicked {
     border-bottom: 3px white solid;
-    /* background-color: white; */
+} */
+
+#tournament_nav_id{
+    height: 100%;
+    width: 100%;
+}
+
+.tournament_section{
+    display: none;
+}
+
+.tournament_section.active{
+    display: flex;
+}
+
+#game_aside_id{
+    display: none;
+}
+
+#tournament_aside_id{
+    display: none;
+}
+
+.Give_Up_tournament{
+    font-size: 36px;
+    color: rgb(237, 129, 121);
+}
+
+.Give_Up_tournament:hover{
+    font-size: 40px;
 }
