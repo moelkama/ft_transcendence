@@ -564,8 +564,8 @@
         <h1 style="color: #ff9800">You are already in a game</h1>
         <h3 style="color: red">if you chose to play new Game, automaticly you lose the previuse one</h2>
         <div class="buttonss">
-            <button class="Continue" onclick="game_asid(false)">Continue</button>
-            <button class="Continue" onclick="new_game('play')">New</button>
+            <button id="already_in_game_continue_id" class="Continue">Continue</button>
+            <button id="already_in_game_new_id" class="Continue">New</button>
         </div>
     </div>
 </section>
@@ -574,8 +574,8 @@
         <h1 style="color: #ff9800">You are already in a Tournament</h1>
         <h3 style="color: red">if you chose to play new Tournament, automaticly you lose the previuse one</h2>
         <div class="buttonss">
-            <button class="Continue" onclick="tournamet_active_section()">Continue</button>
-            <button class="Continue" onclick="new_tournament()">New</button>
+            <button id="already_in_tournament_continue_id" class="Continue" >Continue</button>
+            <button id="already_in_tournament_new_id" class="Continue">New</button>
         </div>
     </div>
 </section>
@@ -622,6 +622,5 @@
     <script type="module" src="track.js"></script>
     <script type="module" src="search.js"></script>
     <script type="module" src="ProfileAction.js"></script>
-
 </body>
 </html>

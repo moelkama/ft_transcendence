@@ -355,7 +355,7 @@ async function run(section_id, socket_url, canvas_id, type)
 function    close_game(return_to_home = true)
 {
     document.getElementById("game_aside_id").style.display = 'none';
-    document.getElementById("tournament_aside_id").style.display = 'none';
+    // document.getElementById("tournament_aside_id").style.display = 'none';
     if (return_to_home)
         border_home();
     game_starting = false;
@@ -363,7 +363,9 @@ function    close_game(return_to_home = true)
 }
 
 function new_game(){
+    console.log('new_game called');
     close_game(false);
+    fds
     tournament_starting = false;
     if (tournament_starting)
         navigate('tournament_input');
@@ -398,9 +400,21 @@ function navigate(section_id) {
     if (section_id == 'play')
     {
         if (tournament_starting)
+        {
+            document.getElementById('already_in_tournament_continue_id').removeEventListener('click', game_asid(false));
+            document.getElementById('already_in_tournament_new_id').removeEventListener('click', new_game());
+            document.getElementById('already_in_tournament_continue_id').addEventListener('click', tournament_asid(false));
+            document.getElementById('already_in_tournament_new_id').addEventListener('click', new_tournament());
             active_section('already_in_tournament_id');
+        }
         else if (game_starting)
+        {
+            document.getElementById('already_in_game_continue_id').removeEventListener('click', tournament_asid(false));
+            document.getElementById('already_in_game_new_id').removeEventListener('click', new_tournament());
+            document.getElementById('already_in_game_continue_id').addEventListener('click', game_asid(false));
+            document.getElementById('already_in_game_new_id').addEventListener('click', new_game());
             active_section('already_in_game_id');
+        }
         else
         {
             game_asid(false);
@@ -422,9 +436,21 @@ function navigate(section_id) {
     else if (section_id == 'tournament_input')
     {
         if (tournament_starting)
+        {
+            document.getElementById('already_in_tournament_continue_id').removeEventListener('click', game_asid(false));
+            document.getElementById('already_in_tournament_new_id').removeEventListener('click', new_game());
+            document.getElementById('already_in_tournament_continue_id').addEventListener('click', tournament_asid(false));
+            document.getElementById('already_in_tournament_new_id').addEventListener('click', new_tournament());
             active_section('already_in_tournament_id');
+        }
         else if (game_starting)
+        {
+            document.getElementById('already_in_game_continue_id').removeEventListener('click', tournament_asid(false));
+            document.getElementById('already_in_game_new_id').removeEventListener('click', new_tournament());
+            document.getElementById('already_in_game_continue_id').addEventListener('click', game_asid(false));
+            document.getElementById('already_in_game_new_id').addEventListener('click', new_game());
             active_section('already_in_game_id');
+        }
         else
             tournament_asid(false);
     }
@@ -557,6 +583,8 @@ function tournament_asid(pushState = true) {
     ///////////////////
     document.getElementById('game-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById("tournament_aside_id").style.display = 'block';
+    if (!game_starting)
+        document.getElementById("game_aside_id").style.display = 'none';
     if (tournament_starting)
     {
         active_section('tournament_nav_id');

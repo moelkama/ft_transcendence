@@ -15,10 +15,10 @@ run :
 	docker compose up
 
 build :
-	docker-compose up --build
+	docker compose up --build
 
 down:
-	docker-compose down -v 
+	docker compose down -v 
 
 remove : per
 	rm -rf chat/data game/data track/data auth/data
@@ -29,8 +29,8 @@ per :
 	sudo chmod -R 0777 .
 
 clean : 
-	docker-compose  down
-	docker-compose rm ${docker-compose ps -a -q}
+	docker compose  down
+	docker compose rm ${docker compose ps -a -q}
 
 fclean : clean
 	docker system prune -a
