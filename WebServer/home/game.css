@@ -361,7 +361,7 @@ section.active {
     width: 25%;
 }
 
-.tournament-input-form .inputt[type="text"] {
+.inputt[type="text"] {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -369,7 +369,7 @@ section.active {
     width: 80%;
 }
 
-.tournament-input-form .buttonn {
+.buttonn {
     width: 80%;
     padding: 10px;
     border: none;

@@ -15,6 +15,7 @@ function initializePageState() {
   const urlParams = new URLSearchParams(window.location.search);
   const page = urlParams.get('page');
 
+  // navigate('play');
   if (!isValidPage(page)) {
     redirectTo404();
     return;
@@ -23,6 +24,9 @@ function initializePageState() {
   switch (page) {
     case 'home':
       border_home();
+      break;
+    case 'game':
+      game_asid();
       break;
     case 'profile':
       border_pr();
@@ -37,7 +41,7 @@ function initializePageState() {
 
 function isValidPage(page) {
   // console.log(page);
-  const validPages = ['home', 'profile', 'chat',null];
+  const validPages = ['home', 'profile', 'chat', 'game',null];
   return validPages.includes(page);
 }
 
@@ -54,6 +58,9 @@ window.onpopstate = function(event) {
     switch (event.state.page) {
       case 'home':
         border_home(false);
+        break;
+      case 'game':
+        game_asid(false);
         break;
       case 'profile':
         border_pr(false);

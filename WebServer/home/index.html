@@ -76,11 +76,13 @@
                         <h1> Choose <span class="span">a</span> game  <span class="span">mode</span></h1>
                     </div>
                     <div class="play">
+                        <div class="game">
+                            <button id="play_game_id" onclick="active_section('local_game_input_id')" class="home_button">local game</button>
+                        </div>
                     <div class="game">
-                            <button class="home_button" onclick="navigate('play')" >play game</button>
+                            <button id="play_game_id" class="home_button">play game</button>
                         </div>
                         <div class="game">
-                            <!-- <button class="home_button" onclick="tst1()">play Tournament</button> -->
                             <button class="home_button" onclick="navigate('tournament_input')">play Tournament</button>
                         </div>
                 </div>
@@ -429,6 +431,14 @@
 
 
 
+<section id="local_game_input_id" class="tournament-input">
+    <form id="local_game_input" class="tournament-input-form">
+        <input class="inputt" type="text" placeholder="player1 display name" required>
+        <input class="inputt" type="text" placeholder="player2 display name" required>
+        <button class="buttonn" onclick="run_local_game()" type="submit">Start</button>
+    </form>
+</section>
+
 
 
 
@@ -561,21 +571,11 @@
 </section>
 <section id="already_in_game_id">
     <div class="already_in_game_class">
-        <h1 style="color: #ff9800">You are already in a game</h1>
-        <h3 style="color: red">if you chose to play new Game, automaticly you lose the previuse one</h2>
+        <h1 id="already_in_game_wrmsg_id" style="color: #ff9800"></h1>
+        <h3 id="already_in_game_exmsg_id" style="color: red"></h2>
         <div class="buttonss">
-            <button id="already_in_game_continue_id" class="Continue">Continue</button>
+            <button id="already_in_game_continue_id" class="Continue" >Continue</button>
             <button id="already_in_game_new_id" class="Continue">New</button>
-        </div>
-    </div>
-</section>
-<section id="already_in_tournament_id">
-    <div class="already_in_game_class">
-        <h1 style="color: #ff9800">You are already in a Tournament</h1>
-        <h3 style="color: red">if you chose to play new Tournament, automaticly you lose the previuse one</h2>
-        <div class="buttonss">
-            <button id="already_in_tournament_continue_id" class="Continue" >Continue</button>
-            <button id="already_in_tournament_new_id" class="Continue">New</button>
         </div>
     </div>
 </section>

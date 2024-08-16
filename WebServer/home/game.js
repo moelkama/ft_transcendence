@@ -288,7 +288,6 @@ async function run(section_id, socket_url, canvas_id, type)
 {
     try
     {
-        // history.pushState(null, '', '/game/');
         first_time = true;
         round = 0;
         if (game_socket)
@@ -365,7 +364,6 @@ function    close_game(return_to_home = true)
 function new_game(){
     console.log('new_game called');
     close_game(false);
-    fds
     tournament_starting = false;
     if (tournament_starting)
         navigate('tournament_input');
@@ -376,48 +374,47 @@ function new_game(){
 function    close_tournament()
 {
     close_game();
+    document.getElementById("tournament_aside_id").style.display = 'none';
     tournament_starting = false;
 }
 
 function new_tournament()
 {
     var n = game_starting;
-    close_game();
+    close_tournament();
     if (n)
         navigate('play');
     else
         navigate('tournament_input');
 }
 
-// function    tournamet_active_section()
-// {
-//     active_section(tournament_active_section);
-//     // if (tournament_active_section == 'tournament_list')
-//     //     document.querySelector('.conteudo').style.display = 'flex';
-// }
-
 function navigate(section_id) {
     if (section_id == 'play')
     {
         if (tournament_starting)
         {
-            document.getElementById('already_in_tournament_continue_id').removeEventListener('click', game_asid(false));
-            document.getElementById('already_in_tournament_new_id').removeEventListener('click', new_game());
-            document.getElementById('already_in_tournament_continue_id').addEventListener('click', tournament_asid(false));
-            document.getElementById('already_in_tournament_new_id').addEventListener('click', new_tournament());
-            active_section('already_in_tournament_id');
+            document.getElementById('already_in_game_wrmsg_id').innerText = "You are already in a Tournament";
+            document.getElementById('already_in_game_exmsg_id').innerText = "if you chose to play new Tournament, automaticly you lose the previuse one";
+            document.getElementById('already_in_game_continue_id').removeEventListener('click', game_asid);
+            document.getElementById('already_in_game_new_id').removeEventListener('click', new_tournament);
+            document.getElementById('already_in_game_continue_id').addEventListener('click', tournament_asid);
+            document.getElementById('already_in_game_new_id').addEventListener('click', new_game);
+            put_section('already_in_game_id');
         }
         else if (game_starting)
         {
-            document.getElementById('already_in_game_continue_id').removeEventListener('click', tournament_asid(false));
-            document.getElementById('already_in_game_new_id').removeEventListener('click', new_tournament());
-            document.getElementById('already_in_game_continue_id').addEventListener('click', game_asid(false));
-            document.getElementById('already_in_game_new_id').addEventListener('click', new_game());
-            active_section('already_in_game_id');
+            document.getElementById('already_in_game_wrmsg_id').innerText = "You are already in a game";
+            document.getElementById('already_in_game_exmsg_id').innerText = "if you chose to play new Game, automaticly you lose the previuse one";
+            document.getElementById('already_in_game_continue_id').removeEventListener('click', tournament_asid);
+            document.getElementById('already_in_game_new_id').removeEventListener('click', new_tournament);
+            document.getElementById('already_in_game_continue_id').addEventListener('click', game_asid);
+            document.getElementById('already_in_game_new_id').addEventListener('click', new_game);
+            put_section('already_in_game_id');
         }
         else
         {
             game_asid(false);
+            document.getElementById("tournament_aside_id").style.display = 'none';
             run('play', '/wss/game/', '2-canvas-id', {'type':'random', 'vs':'undefined'});
         }
     }
@@ -431,28 +428,36 @@ function navigate(section_id) {
     else if (section_id == 'ping-pong-4')
     {
         active_section('loading-section-id');
+        document.getElementById("tournament_aside_id").style.display = 'none';
         run('play-4', '/wss/four_players/', '4-canvas-id', {'type':'random', 'vs':'undefined'});
     }
     else if (section_id == 'tournament_input')
     {
         if (tournament_starting)
         {
-            document.getElementById('already_in_tournament_continue_id').removeEventListener('click', game_asid(false));
-            document.getElementById('already_in_tournament_new_id').removeEventListener('click', new_game());
-            document.getElementById('already_in_tournament_continue_id').addEventListener('click', tournament_asid(false));
-            document.getElementById('already_in_tournament_new_id').addEventListener('click', new_tournament());
-            active_section('already_in_tournament_id');
+            // document.getElementById('already_in_game_continue_id')._listeners = [];
+            // document.getElementById('already_in_game_new_id')._listeners = [];
+            document.getElementById('already_in_game_wrmsg_id').innerText = "You are already in a Tournament";
+            document.getElementById('already_in_game_exmsg_id').innerText = "if you chose to play new Tournament, automaticly you lose the previuse one";
+            document.getElementById('already_in_game_continue_id').removeEventListener('click', game_asid);
+            document.getElementById('already_in_game_new_id').removeEventListener('click', new_game);
+            document.getElementById('already_in_game_continue_id').addEventListener('click', tournament_asid);
+            document.getElementById('already_in_game_new_id').addEventListener('click', new_tournament);
+            console.log('---------------------tournament_input---------------------');
+            put_section('already_in_game_id');
         }
         else if (game_starting)
         {
-            document.getElementById('already_in_game_continue_id').removeEventListener('click', tournament_asid(false));
-            document.getElementById('already_in_game_new_id').removeEventListener('click', new_tournament());
-            document.getElementById('already_in_game_continue_id').addEventListener('click', game_asid(false));
-            document.getElementById('already_in_game_new_id').addEventListener('click', new_game());
-            active_section('already_in_game_id');
+            document.getElementById('already_in_game_wrmsg_id').innerText = "You are already in a game";
+            document.getElementById('already_in_game_exmsg_id').innerText = "if you chose to play new Game, automaticly you lose the previuse one";
+            document.getElementById('already_in_game_continue_id').removeEventListener('click', game_asid);
+            document.getElementById('already_in_game_continue_id').addEventListener('click', tournament_asid);
+            document.getElementById('already_in_game_new_id').removeEventListener('click', new_game);
+            document.getElementById('already_in_game_new_id').addEventListener('click', new_tournament);
+            put_section('already_in_game_id');
         }
         else
-            tournament_asid(false);
+            tournament_asid();
     }
     else
         active_section(section_id);
@@ -477,6 +482,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error fetching CSRF token:', error));
         })();
 
+        document.getElementById('play_game_id').addEventListener('click', function() {navigate('play')});
         document.getElementById('display_name-form-id').addEventListener('submit', function(event) {
             event.preventDefault();
             const formData = new FormData(this);
@@ -536,22 +542,13 @@ function    tst(section_id)
         document.getElementById('tournament_nav_making_item_id').style.cssText = 'font-size: 40px; color: #ff44e4; ';
 }
 
-// function tst1()
-// {
-//     document.getElementById('home').style.display = 'none';
-//     // document.querySelector('.navbar').style.display = 'none';
-//     document.getElementById('tournament_list').classList.add('active');
-//     document.getElementById('tournament_nav_id').classList.add('active');
-//     document.querySelector('.conteudo').style.display = 'flex';
-// }
-
 function game_asid(pushState = true) {
     disactiv_sections();
-    // document.getElementById('Pr-aside').style.borderBottom = '2px solid #bbb';
 
     if (pushState) {
         window.history.pushState({page: 'game'}, 'Game', '?page=game');
     }
+
     document.getElementById('Home-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('Pr-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('game-aside').style.cssText = 'font-size: 40px; color: #ff44e4; ';
@@ -570,9 +567,9 @@ function game_asid(pushState = true) {
 
 function tournament_asid(pushState = true) {
     disactiv_sections();
-    if (pushState) {
-    window.history.pushState({page: 'profile'}, 'Profile', '?page=profile');
-    }
+    // if (pushState) {
+    // window.history.pushState({page: 'profile'}, 'Profile', '?page=profile');
+    // }
     document.getElementById('Home-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('Pr-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('tournament-aside').style.cssText = 'font-size: 40px; color: #ff44e4; ';
