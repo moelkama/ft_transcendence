@@ -6,6 +6,14 @@ var elem = NaN;
 var ctx = NaN;
 var width = NaN;
 var height = NaN;
+//////////////
+var hh = 80
+var ww = 5
+var racket_speed = 1
+var score_to_win = 3
+var local_game_starting = false;
+var local_game_Interval = NaN;
+//////////////
 var lastone = "undefinded"
 var game_starting = false;
 var tournament_starting = false;
@@ -19,6 +27,43 @@ function    draw_ball(b)
     ctx.stroke();
     ctx.fillStyle = "white";
     ctx.fill();
+}
+
+function put_center()
+{
+    ctx.beginPath();
+    ctx.fillStyle = "white";
+    ctx.moveTo(width / 2, 0);
+    ctx.lineTo(width / 2, height);
+    ctx.stroke();
+}
+
+function put_score(score, x, y)
+{
+    ctx.beginPath();
+    ctx.font = "60px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText(score, x,y);
+    ctx.stroke();
+}
+
+function draw_racket(racket)
+{
+    ctx.fillStyle = "white";
+    ctx.fillRect(racket.x, racket.y, racket.w, racket.h);
+}
+
+function draw(data)
+{
+    console.log(data);
+    console.log('makan lhadet:', ctx);
+    ctx.clearRect(0, 0, width, height);
+    draw_racket({'x':width / 2, 'y':0, 'w':1, 'h':height})
+    for (let i = 0; i < data.players.length; i++)
+        draw_racket(data.players[i].racket);
+    draw_ball(data.ping);
+    put_score(data.team1_score, width / 2 + (40), 20 / 100 * height);
+    put_score(data.team2_score, width / 2 - (60 + 10), 20 / 100 * height);
 }
 
 async function get_url(socket_url) {
@@ -77,9 +122,6 @@ async function get_url(socket_url) {
 function challenge_lastone()
 {
     challenge_friend(lastone);
-    // main_socket.send(JSON.stringify({'type':'room.create', 'vs':lastone}));
-    // active_section('loading-section-id');
-    // run('play', '/wss/game/', '2-canvas-id', {'type':'room', 'room_creater':document.getElementById('login').textContent});
 }
 
 function challenge_friend(username)
@@ -87,41 +129,6 @@ function challenge_friend(username)
     main_socket.send(JSON.stringify({'type':'room.create', 'vs':username}));
     active_section('loading-section-id');
     run('play', '/wss/game/', '2-canvas-id', {'type':'room', 'room_creater':document.getElementById('login').textContent});
-}
-
-function put_center()
-{
-    ctx.beginPath();
-    ctx.fillStyle = "white";
-    ctx.moveTo(width / 2, 0);
-    ctx.lineTo(width / 2, height);
-    ctx.stroke();
-}
-
-function put_score(score, x, y)
-{
-    ctx.beginPath();
-    ctx.font = "60px Arial";
-    ctx.fillStyle = "white";
-    ctx.fillText(score, x,y);
-    ctx.stroke();
-}
-
-function draw_racket(racket)
-{
-    ctx.fillStyle = "white";
-    ctx.fillRect(racket.x, racket.y, racket.w, racket.h);
-}
-
-function draw(data)
-{
-    ctx.clearRect(0, 0, width, height);
-    draw_racket({'x':width / 2, 'y':0, 'w':1, 'h':height})
-    for (let i = 0; i < data.players.length; i++)
-        draw_racket(data.players[i].racket);
-    draw_ball(data.ping);
-    put_score(data.team1_score, width / 2 + (40), 20 / 100 * height);
-    put_score(data.team2_score, width / 2 - (60 + 10), 20 / 100 * height);
 }
 
 var first_time = true;
@@ -312,10 +319,10 @@ async function run(section_id, socket_url, canvas_id, type)
             {
                 if (first_time)
                 {
+                    first_time = false;
                     game_starting = true;
                     game_asid(false);
                     // active_section(section_id);
-                    first_time = false;
                     // var countdown = 3;
                     // const interval = setInterval(() => {
                     //     ctx.clearRect(0, 0, width, height);
@@ -542,6 +549,8 @@ function    tst(section_id)
         document.getElementById('tournament_nav_making_item_id').style.cssText = 'font-size: 40px; color: #ff44e4; ';
 }
 
+// import { local_game_starting } from './localgame.js';
+
 function game_asid(pushState = true) {
     disactiv_sections();
 
@@ -559,10 +568,10 @@ function game_asid(pushState = true) {
     ///////////////////
     document.getElementById('tournament-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById("game_aside_id").style.display = 'block';
-    if (game_starting)
+    // if (game_starting)// || local_game_starting)
         active_section('play');
-    else
-        active_section('loading-section-id');
+    // else
+    //     active_section('loading-section-id');
 }
 
 function tournament_asid(pushState = true) {
@@ -589,4 +598,267 @@ function tournament_asid(pushState = true) {
     }
     else
         document.getElementById('tournament_input').style.display = 'flex';
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+var match = null;
+
+class racket
+{
+    constructor(x, y, min, max)
+    {
+        this.x = x
+        this.y = y
+        this.min = min
+        this.max = max
+        this.h = hh
+        this.w = ww
+        this.vy = 0
+        this.score = 0
+    }
+
+    change_direction(data)
+    {
+        if (data == 'Up')
+            this.vy = -racket_speed
+        else if (data == 'Down')
+            this.vy = racket_speed
+        else if (data == 'Stop')
+            this.vy = 0
+    }
+
+    move()
+    {
+        if (this.vy < 0)
+            if (this.y + this.vy > this.min)
+                this.y += this.vy
+            else
+                this.y = this.min
+        else
+        {
+            if (this.y + this.vy < this.max - this.h)
+                this.y += this.vy
+            else
+                this.y = this.max - this.h
+        }
+    }
+
+    serialize_racket()
+    {
+        return {
+            'x': this.x,
+            'y': this.y,
+            'h': this.h,
+            'w': this.w,
+            'score':this.score,
+        }
+    }
+}
+
+class ball
+{
+    constructor(x, y)
+    {
+        this.x = x
+        this.y = y
+        this.r = 10
+        this.angl = 0
+        this.speed = 0.9
+        this.vx = Math.cos(this.angl * Math.pi / 180) * this.speed
+        this.vy = Math.sin(this.angl * Math.pi / 180) * this.speed
+    }
+
+    serialize_ball()
+    {
+        return{
+            'x':this.x,
+            'y':this.y,
+            'r':this.r,
+        }
+    }
+}
+
+class   Match
+{
+    constructor()
+    {
+        this.starting = false;
+        this.players = [new player(0, (height - hh) / 2, 0, height), new player(width - ww, (height - hh) / 2, 0, height)];
+        console.log("Match width: " + width + " height: " + height);
+        this.b = new ball(width / 2, height / 2);
+        this.team1_score = 0;
+        this.team2_score = 0;
+    }
+
+    set_player(player, index)
+    {
+        this.players[index] = player
+    }
+
+    move()
+    {
+        if (this.b.x + this.b.r < ww)
+        {
+            this.team1_score += 1
+            this.b.x = width / 2
+            this.b.y = height / 2
+            // this.b.__init__(width / 2, height / 2)
+            // await asyncio.sleep(1)
+        }
+        if (this.b.x - this.b.r > width - ww)
+        {
+            this.team2_score += 1
+            this.b.x = width / 2
+            this.b.y = height / 2
+            // this.b.__init__(width / 2, height / 2)
+            // await asyncio.sleep(1)
+        }
+        if (this.b.vx > 0)
+        {
+            if ((this.b.x + this.b.r) + this.b.vx < (width - ww))
+                this.b.x += this.b.vx
+            else
+            {
+                if ((this.b.y) < this.players[1].racket.y  || this.b.y >this.players[1].racket.y + hh)
+                    this.b.x += this.b.vx
+                else
+                {
+                    this.b.x += (width - ww) - (this.b.x + this.b.r)
+                    this.b.vx = -this.b.vx
+                }
+            }
+        }
+        else
+        {
+            if (this.b.y < this.players[0].racket.y  || this.b.y >this.players[0].racket.y + hh  || (this.b.x - this.b.r) + this.b.vx > ww)
+                this.b.x += this.b.vx
+            else
+            {
+                this.b.x = ww + this.b.r
+                this.b.vx = -this.b.vx
+            }
+        }
+        if (this.b.vy > 0)
+        {
+            if (this.b.y + this.b.r + this.b.vy < (height - 0))
+                this.b.y += this.b.vy
+            else
+            {
+                this.b.y = (height - 0) - this.b.r
+                this.b.vy = -this.b.vy
+            }
+        }
+        else
+        {
+            if ((this.b.y - this.b.r) + this.b.vy > 0)
+                this.b.y += this.b.vy
+            else
+            {
+                this.b.y = this.b.r + 0
+                this.b.vy = -this.b.vy
+            }
+        }
+        // for player in this.players
+        //     player.racket.move()
+    }
+
+    run_game()
+    {
+        // this.move();
+        draw(serialize_Match(this));
+        if (this.team1_score == score_to_win)
+            return 1
+        if (this.team2_score == score_to_win)
+            return 2
+        // }
+    }
+}
+
+function serialize_Match(o)
+{
+    return{
+        'type':'game.state',
+        'players':o.players.map(p => ({ racket: p.racket.serialize_racket() })),
+        'ping':o.b.serialize_ball(),
+        'team1_score':o.team1_score,
+        'team2_score':o.team2_score,
+    }
+}
+
+class   player
+{
+    constructor(x, y, min, max)
+    {
+        this.racket = new racket(x, y, min, max)
+    }
+}
+
+
+function    run_local_game() {
+    console.log("run_local_game start");
+    ///////////////
+    elem = document.getElementById('2-canvas-id');
+    ctx = elem.getContext("2d");
+    width = elem.width
+    height = elem.height
+    ///////////////
+    match = new Match();
+    document.getElementById("2-canvas-display_name-id-0").innerHTML = 'moelkama';//document.getElementById("local_game_player1_display_name_id").value;
+    document.getElementById("2-canvas-icon-id-0").src = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fgamesgo.net%2Ffire-and-water-geometry-dash%2F&psig=AOvVaw3hNLYds0rZ9is8AI5UvzoL&ust=1724064954591000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMCv_tOw_ocDFQAAAAAdAAAAABAE';
+    document.getElementById("2-canvas-display_name-id-1").innerHTML = 'mkatfi';//document.getElementById("local_game_player2_display_name_id").value;
+    document.getElementById("2-canvas-icon-id-1").src = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fgamesgo.net%2Ffire-and-water-geometry-dash%2F&psig=AOvVaw3hNLYds0rZ9is8AI5UvzoL&ust=1724064954591000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMCv_tOw_ocDFQAAAAAdAAAAABAE';
+    local_game_starting = true;
+
+    document.addEventListener("keydown", (event) => {
+        if (local_game_starting)
+        {
+            if (event.key == "ArrowUp")
+            {
+                console.log("event.key: " + event.key);
+                console.log("match.players[0].racket: " + match.players[0].racket.vy);
+                match.players[0].racket.change_direction('Up');
+            }
+            else if (event.key == "ArrowDown")
+                match.players[0].racket.change_direction('Down');
+            else if (event.key == "w")
+                match.players[1].racket.change_direction('Up');
+            else if (event.key == "s")
+                match.players[1].racket.change_direction('Down');
+        }
+    });
+    
+    document.addEventListener("keyup", (event) => {
+        if (local_game_starting)
+        {
+            if (event.key == "ArrowUp" || event.key == "ArrowDown")
+                match.players[0].racket.change_direction('Stop');
+            else if (event.key == "w" || event.key == "s")
+                match.players[1].racket.change_direction('Stop');
+        }
+    });
+    game_asid();
+    // match.run_game();
+    local_game_Interval = setInterval(match.run_game);
 }

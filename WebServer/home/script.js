@@ -25,9 +25,9 @@ function initializePageState() {
     case 'home':
       border_home();
       break;
-    case 'game':
-      game_asid();
-      break;
+    // case 'game':
+    //   game_asid();
+    //   break;
     case 'profile':
       border_pr();
       break;
@@ -59,9 +59,9 @@ window.onpopstate = function(event) {
       case 'home':
         border_home(false);
         break;
-      case 'game':
-        game_asid(false);
-        break;
+      // case 'game':
+      //   game_asid(false);
+      //   break;
       case 'profile':
         border_pr(false);
         break;

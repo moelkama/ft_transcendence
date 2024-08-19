@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ping-pong</title>
@@ -45,7 +46,6 @@
                     <ul>
                         <li ><a  data-target="home"   onclick="border_home()"  class="icons"  ><i id="Home-aside" class="fa-solid fa-house"></i></a></li>
                         <li  ><a data-target="profile" onclick="border_pr()"  class="icons" ><i id="Pr-aside" class="fa-solid fa-user"></i></a></li>
-                       
 
                        <!-- fa-solid fa-trophy-star -->
                         <a id="game_aside_id" class="icons" onclick="game_asid(false)"><i id="game-aside" class="fa-solid fa-table-tennis-paddle-ball"></i></a>
@@ -77,7 +77,8 @@
                     </div>
                     <div class="play">
                         <div class="game">
-                            <button id="play_game_id" onclick="active_section('local_game_input_id')" class="home_button">local game</button>
+                            <!-- onclick="active_section('local_game_input_id')" -->
+                            <button id="play_local_game_id" onclick="run_local_game()" class="home_button">local</button>
                         </div>
                     <div class="game">
                             <button id="play_game_id" class="home_button">play game</button>
@@ -153,13 +154,10 @@
                         </ul>
                     </div>
                 <div class="chat-container">
-                    
                     <div id="chat-header" class="chat-header">
                         <div class="image-chat" id="image-chat">
-                            
                         </div>
                         <h2 id="chat-friend-name"><span class="span">Select</span> a friend to <span class="span">chat</span></h2>
-                        
                     </div>
                     
                         <div id="chat-messages" class="chat-messages">
@@ -366,10 +364,10 @@
             <div class="users">
                 <div class="user1">
                     <img id="2-canvas-icon-id-0" class="icon">
-                    <h2 id="2-canvas-display_name-id-0" class="display-name">akatfi</h2>
+                    <h2 id="2-canvas-display_name-id-0" class="display-name"></h2>
                 </div>
                 <div class="user2">
-                    <h2 id="2-canvas-display_name-id-1" class="display-name">moelkama</h2>
+                    <h2 id="2-canvas-display_name-id-1" class="display-name"></h2>
                     <img id="2-canvas-icon-id-1" class="icon">
                 </div>
             </div>
@@ -433,9 +431,9 @@
 
 <section id="local_game_input_id" class="tournament-input">
     <form id="local_game_input" class="tournament-input-form">
-        <input class="inputt" type="text" placeholder="player1 display name" required>
-        <input class="inputt" type="text" placeholder="player2 display name" required>
-        <button class="buttonn" onclick="run_local_game()" type="submit">Start</button>
+        <input id="local_game_player1_display_name_id" class="inputt" type="text" placeholder="player1 display name" required>
+        <input id="local_game_player2_display_name_id" class="inputt" type="text" placeholder="player2 display name" required>
+        <button class="buttonn" onclick="run_local_game()">Start</button>
     </form>
 </section>
 
@@ -606,6 +604,7 @@
             </article>
     </div>
     <script src="game.js"></script>
+    <script src="localgame.js"></script>
     <script src="script.js"></script>
     <script type="module" src="match.js"></script>
     <script type="module" src="leader.js"></script>
