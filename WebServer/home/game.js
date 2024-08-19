@@ -56,7 +56,6 @@ function draw_racket(racket)
 function draw(data)
 {
     console.log(data);
-    console.log('makan lhadet:', ctx);
     ctx.clearRect(0, 0, width, height);
     draw_racket({'x':width / 2, 'y':0, 'w':1, 'h':height})
     for (let i = 0; i < data.players.length; i++)
@@ -706,7 +705,6 @@ class   Match
     {
         this.starting = false;
         this.players = [new player(0, (height - hh) / 2, 0, height), new player(width - ww, (height - hh) / 2, 0, height)];
-        console.log("Match width: " + width + " height: " + height);
         this.b = new ball(width / 2, height / 2);
         this.team1_score = 0;
         this.team2_score = 0;
@@ -721,6 +719,7 @@ class   Match
     {
         if (this.b.x + this.b.r < ww)
         {
+            console.log('weeeeeeeeeeeeeeee', this.b.x, this.b.r, ww);
             this.team1_score += 1
             this.b.x = width / 2
             this.b.y = height / 2
@@ -787,11 +786,11 @@ class   Match
     run_game()
     {
         // this.move();
-        draw(serialize_Match(this));
-        if (this.team1_score == score_to_win)
-            return 1
-        if (this.team2_score == score_to_win)
-            return 2
+        draw(serialize_Match(match));
+        // if (this.team1_score == score_to_win)
+        //     return 1
+        // if (this.team2_score == score_to_win)
+        //     return 2
         // }
     }
 }
@@ -815,7 +814,6 @@ class   player
     }
 }
 
-
 function    run_local_game() {
     console.log("run_local_game start");
     ///////////////
@@ -824,7 +822,8 @@ function    run_local_game() {
     width = elem.width
     height = elem.height
     ///////////////
-    match = new Match();
+    if (!local_game_starting)
+        match = new Match();
     document.getElementById("2-canvas-display_name-id-0").innerHTML = 'moelkama';//document.getElementById("local_game_player1_display_name_id").value;
     document.getElementById("2-canvas-icon-id-0").src = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fgamesgo.net%2Ffire-and-water-geometry-dash%2F&psig=AOvVaw3hNLYds0rZ9is8AI5UvzoL&ust=1724064954591000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMCv_tOw_ocDFQAAAAAdAAAAABAE';
     document.getElementById("2-canvas-display_name-id-1").innerHTML = 'mkatfi';//document.getElementById("local_game_player2_display_name_id").value;
@@ -836,8 +835,6 @@ function    run_local_game() {
         {
             if (event.key == "ArrowUp")
             {
-                console.log("event.key: " + event.key);
-                console.log("match.players[0].racket: " + match.players[0].racket.vy);
                 match.players[0].racket.change_direction('Up');
             }
             else if (event.key == "ArrowDown")
@@ -848,7 +845,7 @@ function    run_local_game() {
                 match.players[1].racket.change_direction('Down');
         }
     });
-    
+
     document.addEventListener("keyup", (event) => {
         if (local_game_starting)
         {
@@ -859,6 +856,6 @@ function    run_local_game() {
         }
     });
     game_asid();
-    // match.run_game();
+    match.run_game();
     local_game_Interval = setInterval(match.run_game);
 }
