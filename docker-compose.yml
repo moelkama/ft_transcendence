@@ -6,7 +6,7 @@ services:
       - ./auth/data/db:/var/lib/postgresql/data
     env_file:
       - .env
-    restart: always
+    # restart: always
 
   gamedb:
     image: postgres
@@ -17,7 +17,7 @@ services:
       - .env
     depends_on:
       - authdb
-    restart: always
+    # restart: always
     
   trackdb:
     image: postgres
@@ -28,7 +28,7 @@ services:
       - .env
     depends_on:
       - gamedb
-    restart: always
+    # restart: always
     
   chatdb:
     image: postgres
@@ -39,7 +39,7 @@ services:
       - .env
     depends_on:
       - authdb
-    restart: always
+    # restart: always
 
   auth:
     build: auth
@@ -51,7 +51,7 @@ services:
       - .env
     depends_on:
       - authdb
-    restart: always
+    # restart: always
 
   game:
     image: djangoo
@@ -62,7 +62,7 @@ services:
       - .env
     depends_on:
       - gamedb
-    restart: always
+    # restart: always
 
   track:
     image: djangoo
@@ -73,7 +73,7 @@ services:
       - .env
     depends_on:
       - gamedb
-    restart: always
+    # restart: always
   
   chat:
     image: djangoo
@@ -84,7 +84,7 @@ services:
       - .env
     depends_on:
       - chatdb
-    restart: always
+    # restart: always
 
   webserver:
     build: WebServer
@@ -97,12 +97,12 @@ services:
     depends_on:
       - game
       - auth
-    restart: always
+    # restart: always
 
   redis:
     image: redis
     container_name: redis
-    restart: always
+    # restart: always
     depends_on:
       - game
       - track

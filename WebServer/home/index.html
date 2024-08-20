@@ -76,12 +76,11 @@
                         <h1> Choose <span class="span">a</span> game  <span class="span">mode</span></h1>
                     </div>
                     <div class="play">
-                        <div class="game">
-                            <!-- onclick="active_section('local_game_input_id')" -->
-                            <button id="play_local_game_id" onclick="run_local_game()" class="home_button">local</button>
-                        </div>
+                        <!-- <div class="game">
+                            <button id="play_local_game_id" onclick="flex_section('local_game_input_id')" class="home_button">local</button>
+                        </div> -->
                     <div class="game">
-                            <button id="play_game_id" class="home_button">play game</button>
+                            <button id="play_game_id" class="home_button" onclick="local_or_remote_game('game')">play game</button>
                         </div>
                         <div class="game">
                             <button class="home_button" onclick="navigate('tournament_input')">play Tournament</button>
@@ -385,7 +384,7 @@
     <div class="result_buttuns">
         <button class="Retry_button" onclick="challenge_lastone()">Retry</button>
         <button class="Retry_button" onclick="navigate('play')">Play Random</button>
-        <button class="Home_button" onclick="closeModal('resultModal')">Home</button>
+        <button class="Home_button" onclick="border_home()">Home</button>
     </div>
 </section>
 <section id="refuse_game_id">
@@ -398,7 +397,7 @@
     </div>
     <!-- <div class="buttonss">
         <button class="Retry_button" onclick="navigate('play')">Play Random</button>
-        <button class="Home_button" onclick="closeModal('refuse_game_id')">Home</button>
+        <button class="Home_button" onclick="border_home()">Home</button>
     </div> -->
 </section>
 <section id="play-4" >
@@ -427,14 +426,35 @@
     </div>
 </section>
 
+<section id="local_or_remote" class="tournament-input">
+    <div class="result_buttuns">
+        <button id="local_button_id" class="Retry_button" style="width: 400px;" onclick="flex_section('local_game_input_id')">Local</button>
+        <button id="remote_button_id" class="Home_button" style="width: 400px;" onclick="navigate('play')">Remote</button>
+    </div>
+</section>
 
-
+<section id="localresultModal" class="result_class">
+    <div class="localresultModal_border">
+        <h1 class="result_msg">Congration You Won</h1>
+        <div class="con">
+            <img id="local_game_winner_icon_id">
+        </div>
+        <div class="center_contents">
+            <h1 id="local_game_winner_dname_id"></h1>
+        </div>
+    </div>
+    <div class="result_buttuns">
+        <button class="Retry_button" onclick="flex_section('local_game_input_id')">Retry</button>
+        <button class="Home_button" onclick="border_home()">Home</button>
+    </div>
+</section>
 <section id="local_game_input_id" class="tournament-input">
-    <form id="local_game_input" class="tournament-input-form">
+    <div id="local_game_input" class="tournament-input-form">
         <input id="local_game_player1_display_name_id" class="inputt" type="text" placeholder="player1 display name" required>
         <input id="local_game_player2_display_name_id" class="inputt" type="text" placeholder="player2 display name" required>
+        <h3 id="local_display_names_msg_id" style="display: flex; text-align: center; margin-bottom: 10px; color: red;"></h3> 
         <button class="buttonn" onclick="run_local_game()">Start</button>
-    </form>
+    </div>
 </section>
 
 
@@ -533,7 +553,7 @@
     <div class="result_buttuns">
         <button class="Retry_button" onclick="challenge_lastone()">Retry</button>
         <button class="Retry_button" onclick="navigate('play')">Play Random</button>
-        <button class="Home_button" onclick="closeModal('resultModal')">Home</button>
+        <button class="Home_button" onclick="border_home()">Home</button>
     </div>
 </section>
 <section id="game_notification_id" class="game_notification">

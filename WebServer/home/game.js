@@ -55,7 +55,6 @@ function draw_racket(racket)
 
 function draw(data)
 {
-    console.log(data);
     ctx.clearRect(0, 0, width, height);
     draw_racket({'x':width / 2, 'y':0, 'w':1, 'h':height})
     for (let i = 0; i < data.players.length; i++)
@@ -148,6 +147,27 @@ function    disactiv_sections()
     });
 }
 
+function    local_or_remote_game(type)
+{
+    // if (type == 'game')
+    // {
+    //     document.getElementById('local_button_id').addEventListener('click', (e)=>{flex_section('local_game_input_id')});
+    //     document.getElementById('remote_button_id').addEventListener('click', function() {navigate('play')});
+    // }
+    flex_section('local_or_remote');
+    // else
+    // {
+    //     document.getElementById('local_game_input_id').style.display = 'none';
+    //     document.getElementById('game_aside_id').style.display = 'block';
+    // }
+}
+
+function    flex_section(section_id)
+{
+    disactiv_sections();
+    document.getElementById(section_id).style.display = 'flex';
+}
+
 function    put_section(section_id){
     document.getElementById(section_id).classList.add('active');
     if (section_id == 'tournament_list')
@@ -221,10 +241,10 @@ function    refuse_game()
     main_socket.send(JSON.stringify({'type':'room.refuse', 'vs':document.getElementById('game_notification_username_id').innerHTML}));
 }
 
-function closeModal(id) {
-    disactiv_sections();
-    document.getElementById("home").style.display = 'flex';
-}
+// function closeModal(id) {
+//     disactiv_sections();
+//     document.getElementById("home").style.display = 'flex';
+// }
 
 var round = 0;
 function    tournament_info(players, section_id)
@@ -488,7 +508,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error fetching CSRF token:', error));
         })();
 
-        document.getElementById('play_game_id').addEventListener('click', function() {navigate('play')});
         document.getElementById('display_name-form-id').addEventListener('submit', function(event) {
             event.preventDefault();
             const formData = new FormData(this);
@@ -628,39 +647,39 @@ class racket
 {
     constructor(x, y, min, max)
     {
-        this.x = x
-        this.y = y
-        this.min = min
-        this.max = max
-        this.h = hh
-        this.w = ww
-        this.vy = 0
-        this.score = 0
+        this.x = x;
+        this.y = y;
+        this.min = min;
+        this.max = max;
+        this.h = hh;
+        this.w = ww;
+        this.vy = 0;
+        this.score = 0;
     }
 
     change_direction(data)
     {
         if (data == 'Up')
-            this.vy = -racket_speed
+            this.vy = -racket_speed;
         else if (data == 'Down')
-            this.vy = racket_speed
+            this.vy = racket_speed;
         else if (data == 'Stop')
-            this.vy = 0
+            this.vy = 0;
     }
 
     move()
     {
         if (this.vy < 0)
             if (this.y + this.vy > this.min)
-                this.y += this.vy
+                this.y += this.vy;
             else
-                this.y = this.min
+                this.y = this.min;
         else
         {
             if (this.y + this.vy < this.max - this.h)
-                this.y += this.vy
+                this.y += this.vy;
             else
-                this.y = this.max - this.h
+                this.y = this.max - this.h;
         }
     }
 
@@ -680,13 +699,13 @@ class ball
 {
     constructor(x, y)
     {
-        this.x = x
-        this.y = y
-        this.r = 10
-        this.angl = 0
-        this.speed = 0.9
-        this.vx = Math.cos(this.angl * Math.pi / 180) * this.speed
-        this.vy = Math.sin(this.angl * Math.pi / 180) * this.speed
+        this.x = x;
+        this.y = y;
+        this.r = 10;
+        this.angl = 30;
+        this.speed = 1.5;
+        this.vx = Math.cos(this.angl * Math.PI / 180) * this.speed;
+        this.vy = Math.sin(this.angl * Math.PI / 180) * this.speed;
     }
 
     serialize_ball()
@@ -717,82 +736,104 @@ class   Match
 
     move()
     {
+        console.log('weeeeeeeeeeeeeeee', this.b.vx, this.b.vy);
         if (this.b.x + this.b.r < ww)
         {
-            console.log('weeeeeeeeeeeeeeee', this.b.x, this.b.r, ww);
-            this.team1_score += 1
-            this.b.x = width / 2
-            this.b.y = height / 2
+            this.team1_score += 1;
+            this.b.x = width / 2;
+            this.b.y = height / 2;
             // this.b.__init__(width / 2, height / 2)
             // await asyncio.sleep(1)
         }
         if (this.b.x - this.b.r > width - ww)
         {
-            this.team2_score += 1
-            this.b.x = width / 2
-            this.b.y = height / 2
+            this.team2_score += 1;
+            this.b.x = width / 2;
+            this.b.y = height / 2;
             // this.b.__init__(width / 2, height / 2)
             // await asyncio.sleep(1)
         }
         if (this.b.vx > 0)
         {
             if ((this.b.x + this.b.r) + this.b.vx < (width - ww))
-                this.b.x += this.b.vx
+                this.b.x += this.b.vx;
             else
             {
                 if ((this.b.y) < this.players[1].racket.y  || this.b.y >this.players[1].racket.y + hh)
-                    this.b.x += this.b.vx
+                    this.b.x += this.b.vx;
                 else
                 {
-                    this.b.x += (width - ww) - (this.b.x + this.b.r)
-                    this.b.vx = -this.b.vx
+                    this.b.x += (width - ww) - (this.b.x + this.b.r);
+                    this.b.vx = -this.b.vx;
                 }
             }
         }
         else
         {
             if (this.b.y < this.players[0].racket.y  || this.b.y >this.players[0].racket.y + hh  || (this.b.x - this.b.r) + this.b.vx > ww)
-                this.b.x += this.b.vx
+                this.b.x += this.b.vx;
             else
             {
-                this.b.x = ww + this.b.r
-                this.b.vx = -this.b.vx
+                this.b.x = ww + this.b.r;
+                this.b.vx = -this.b.vx;
             }
         }
         if (this.b.vy > 0)
         {
             if (this.b.y + this.b.r + this.b.vy < (height - 0))
-                this.b.y += this.b.vy
+                this.b.y += this.b.vy;
             else
             {
-                this.b.y = (height - 0) - this.b.r
-                this.b.vy = -this.b.vy
+                this.b.y = (height - 0) - this.b.r;
+                this.b.vy = -this.b.vy;
             }
         }
         else
         {
             if ((this.b.y - this.b.r) + this.b.vy > 0)
-                this.b.y += this.b.vy
+                this.b.y += this.b.vy;
             else
             {
-                this.b.y = this.b.r + 0
-                this.b.vy = -this.b.vy
+                this.b.y = this.b.r + 0;
+                this.b.vy = -this.b.vy;
             }
         }
-        // for player in this.players
-        //     player.racket.move()
+        this.players.forEach(function(item) {
+            item.racket.move();
+          });
     }
 
     run_game()
     {
-        // this.move();
+        match.move();
         draw(serialize_Match(match));
-        // if (this.team1_score == score_to_win)
-        //     return 1
-        // if (this.team2_score == score_to_win)
-        //     return 2
-        // }
+        if (match.team1_score == score_to_win)
+        {
+            clearInterval(local_game_Interval);
+            show_local_game_Result(0);
+        }
+        else if (match.team2_score == score_to_win)
+        {
+            clearInterval(local_game_Interval);
+            show_local_game_Result(1);
+        }
     }
+}
+
+function show_local_game_Result(idx){
+    local_game_starting = false;
+    document.getElementById("game_aside_id").style.display = 'none';
+    if (idx == 1)
+    {
+        document.getElementById("local_game_winner_dname_id").innerHTML = document.getElementById("2-canvas-display_name-id-0").innerHTML;
+        document.getElementById("local_game_winner_icon_id").src = document.getElementById("2-canvas-icon-id-0").src;
+    }
+    else
+    {
+        document.getElementById("local_game_winner_dname_id").innerHTML = document.getElementById("2-canvas-display_name-id-1").innerHTML;
+        document.getElementById("local_game_winner_icon_id").src = document.getElementById("2-canvas-icon-id-1").src;
+    }
+    active_section('localresultModal');
 }
 
 function serialize_Match(o)
@@ -817,45 +858,50 @@ class   player
 function    run_local_game() {
     console.log("run_local_game start");
     ///////////////
-    elem = document.getElementById('2-canvas-id');
-    ctx = elem.getContext("2d");
-    width = elem.width
-    height = elem.height
-    ///////////////
-    if (!local_game_starting)
-        match = new Match();
-    document.getElementById("2-canvas-display_name-id-0").innerHTML = 'moelkama';//document.getElementById("local_game_player1_display_name_id").value;
-    document.getElementById("2-canvas-icon-id-0").src = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fgamesgo.net%2Ffire-and-water-geometry-dash%2F&psig=AOvVaw3hNLYds0rZ9is8AI5UvzoL&ust=1724064954591000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMCv_tOw_ocDFQAAAAAdAAAAABAE';
-    document.getElementById("2-canvas-display_name-id-1").innerHTML = 'mkatfi';//document.getElementById("local_game_player2_display_name_id").value;
-    document.getElementById("2-canvas-icon-id-1").src = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fgamesgo.net%2Ffire-and-water-geometry-dash%2F&psig=AOvVaw3hNLYds0rZ9is8AI5UvzoL&ust=1724064954591000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMCv_tOw_ocDFQAAAAAdAAAAABAE';
-    local_game_starting = true;
+    var player1_display_name = document.getElementById("local_game_player1_display_name_id").value;
+    var player2_display_name = document.getElementById("local_game_player2_display_name_id").value;
+    if (player1_display_name === player2_display_name)
+       document.getElementById("local_display_names_msg_id").innerHTML = "you can't have the same name";
+    else{
+        elem = document.getElementById('2-canvas-id');
+        document.getElementById("local_game_input_id").style.display = 'none';
+        ctx = elem.getContext("2d");
+        width = elem.width
+        height = elem.height
+        ///////////////
+        if (!local_game_starting)
+            match = new Match();
+        document.getElementById("2-canvas-display_name-id-0").innerHTML = player1_display_name;
+        document.getElementById("2-canvas-icon-id-0").src = '/home/resrc/game/ice.png';
+        document.getElementById("2-canvas-display_name-id-1").innerHTML = player2_display_name;
+        document.getElementById("2-canvas-icon-id-1").src = '/home/resrc/game/fire.png';
+        local_game_starting = true;
 
-    document.addEventListener("keydown", (event) => {
-        if (local_game_starting)
-        {
-            if (event.key == "ArrowUp")
-            {
-                match.players[0].racket.change_direction('Up');
+        game_asid();
+        local_game_Interval = setInterval(match.run_game);
+        document.addEventListener("keydown", (event) => {
+            if (local_game_starting)
+                {
+                    if (event.key == "ArrowUp")
+                        match.players[0].racket.change_direction('Up');
+                    else if (event.key == "ArrowDown")
+                        match.players[0].racket.change_direction('Down');
+                    else if (event.key == "w")
+                        match.players[1].racket.change_direction('Up');
+                else if (event.key == "s")
+                    match.players[1].racket.change_direction('Down');
             }
-            else if (event.key == "ArrowDown")
-                match.players[0].racket.change_direction('Down');
-            else if (event.key == "w")
-                match.players[1].racket.change_direction('Up');
-            else if (event.key == "s")
-                match.players[1].racket.change_direction('Down');
-        }
-    });
-
-    document.addEventListener("keyup", (event) => {
-        if (local_game_starting)
-        {
-            if (event.key == "ArrowUp" || event.key == "ArrowDown")
-                match.players[0].racket.change_direction('Stop');
-            else if (event.key == "w" || event.key == "s")
-                match.players[1].racket.change_direction('Stop');
-        }
-    });
-    game_asid();
-    match.run_game();
-    local_game_Interval = setInterval(match.run_game);
+        });
+        
+        document.addEventListener("keyup", (event) => {
+            if (local_game_starting)
+                {
+                    if (event.key == "ArrowUp" || event.key == "ArrowDown")
+                        match.players[0].racket.change_direction('Stop');
+                    else if (event.key == "w" || event.key == "s")
+                        match.players[1].racket.change_direction('Stop');
+                }
+            });
+    }
+    console.log("run_local_game enc");
 }

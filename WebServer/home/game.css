@@ -214,6 +214,13 @@ button {
     background-color: #f0f0f0;
 }
 
+.localresultModal_border{
+    border: 3px solid #ffffff1d;
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
+    padding: 15px;
+}
+
 .result_class{
     position: fixed;
     top: 50%;
@@ -525,14 +532,13 @@ section.active {
     align-items: center;
 }
 
-#game_notification_icon_id, #game_refuse_icon_id{
+#game_notification_icon_id, #game_refuse_icon_id, #local_game_winner_icon_id{
     margin-top: 5px;
     margin-bottom: 5px;
     height: 100px;
     width: 100px;
     border-radius: 50%;
 }
-
 #game_notification_username_id, #game_refuse_username_id{
     text-align: center;
 }
@@ -676,9 +682,7 @@ align_items_center{
     color: white;
     padding: 10px 0;
 }
-section {
-    display: none;
-}
+
 /* .tournament_nav_button {
     background-color: transparent;
     font-size: 16px;
@@ -720,4 +724,8 @@ section {
 
 .Give_Up_tournament:hover{
     font-size: 40px;
+}
+
+section {
+    display: none;
 }
