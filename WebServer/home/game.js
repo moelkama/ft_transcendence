@@ -1,18 +1,19 @@
 var url;
 
-var game_socket = NaN;
-var main_socket = NaN;
-var elem = NaN;
-var ctx = NaN;
-var width = NaN;
-var height = NaN;
+var game_socket = null;
+var main_socket = null;
+var elem = null;
+var ctx = null;
+var width = null;
+var height = null;
 //////////////
 var hh = 80
 var ww = 5
 var racket_speed = 1
 var score_to_win = 3
 var local_game_starting = false;
-var local_game_Interval = NaN;
+var local_game_Interval = null;
+var local_game_Interval_starting = false;
 //////////////
 var lastone = "undefinded"
 var game_starting = false;
@@ -164,7 +165,9 @@ function    local_or_remote_game(type)
 
 function    flex_section(section_id)
 {
+    console.log('flex_section called', section_id);
     disactiv_sections();
+    document.getElementById('local_or_remote').style.display = 'none';
     document.getElementById(section_id).style.display = 'flex';
 }
 
@@ -214,6 +217,13 @@ function showResult(result)
         game_socket.close(1000, 'Normal Closure');
     }
     active_section('resultModal');
+    elem = document.getElementById('');
+    if (element._listeners) {
+        element._listeners.forEach(listener => {
+          element.removeEventListener(listener.event, listener.handler);
+        });
+        element._listeners = []; // Clear the listeners array
+      }
 }
 
 function Continue_game(action)
@@ -266,24 +276,6 @@ function    tournament_info(players, section_id)
     }
     round++;
 }
-
-document.addEventListener("keydown", (event) => {
-    if (game_socket.readyState === WebSocket.OPEN)
-    {
-        if (event.key == "ArrowUp")
-            game_socket.send(JSON.stringify({'type':'move', 'move':'Up'}));
-        else if (event.key == "ArrowDown")
-            game_socket.send(JSON.stringify({'type':'move', 'move':'Down'}));
-    }
-});
-
-document.addEventListener("keyup", (event) => {
-    if (game_socket.readyState === WebSocket.OPEN)
-    {
-        if (event.key == "ArrowUp" || event.key == "ArrowDown")
-            game_socket.send(JSON.stringify({'type':'move', 'move':'Stop'}));
-    }
-});
 
 function    tournament_list(data)
 {
@@ -350,6 +342,23 @@ async function run(section_id, socket_url, canvas_id, type)
                     //         clearInterval(interval);
                     //     countdown -= 1;
                     // }, 1000);
+                    document.addEventListener("keydown", (event) => {
+                        if (game_socket.readyState === WebSocket.OPEN)
+                        {
+                            if (event.key == "ArrowUp")
+                                game_socket.send(JSON.stringify({'type':'move', 'move':'Up'}));
+                            else if (event.key == "ArrowDown")
+                                game_socket.send(JSON.stringify({'type':'move', 'move':'Down'}));
+                        }
+                    });
+                    
+                    document.addEventListener("keyup", (event) => {
+                        if (game_socket.readyState === WebSocket.OPEN)
+                        {
+                            if (event.key == "ArrowUp" || event.key == "ArrowDown")
+                                game_socket.send(JSON.stringify({'type':'move', 'move':'Stop'}));
+                        }
+                    });
                 }
                 draw(data);
             }
@@ -586,10 +595,10 @@ function game_asid(pushState = true) {
     ///////////////////
     document.getElementById('tournament-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById("game_aside_id").style.display = 'block';
-    // if (game_starting)// || local_game_starting)
+    if (game_starting || local_game_starting)
         active_section('play');
-    // else
-    //     active_section('loading-section-id');
+    else
+        active_section('loading-section-id');
 }
 
 function tournament_asid(pushState = true) {
@@ -702,7 +711,7 @@ class ball
         this.x = x;
         this.y = y;
         this.r = 10;
-        this.angl = 30;
+        this.angl = 0;
         this.speed = 1.5;
         this.vx = Math.cos(this.angl * Math.PI / 180) * this.speed;
         this.vy = Math.sin(this.angl * Math.PI / 180) * this.speed;
@@ -809,19 +818,21 @@ class   Match
         draw(serialize_Match(match));
         if (match.team1_score == score_to_win)
         {
-            clearInterval(local_game_Interval);
             show_local_game_Result(0);
         }
         else if (match.team2_score == score_to_win)
         {
-            clearInterval(local_game_Interval);
             show_local_game_Result(1);
         }
     }
 }
 
 function show_local_game_Result(idx){
+    clearInterval(local_game_Interval);
+    delete match;
     local_game_starting = false;
+    local_game_Interval_starting = false;
+    document.getElementById("local_display_names_msg_id").innerHTML = '';
     document.getElementById("game_aside_id").style.display = 'none';
     if (idx == 1)
     {
@@ -855,6 +866,22 @@ class   player
     }
 }
 
+function    start_pause_game()
+{
+    if (local_game_Interval_starting)
+    {
+        local_game_Interval_starting = false;
+        clearInterval(local_game_Interval);
+        document.getElementById("start_pause_game_id").className = 'fa-solid fa-play';
+    }
+    else
+    {
+        local_game_Interval_starting = true;
+        local_game_Interval = setInterval(match.run_game);
+        document.getElementById("start_pause_game_id").className = 'fa-solid fa-pause';
+    }
+}
+
 function    run_local_game() {
     console.log("run_local_game start");
     ///////////////
@@ -879,6 +906,7 @@ function    run_local_game() {
 
         game_asid();
         local_game_Interval = setInterval(match.run_game);
+        local_game_Interval_starting = true;
         document.addEventListener("keydown", (event) => {
             if (local_game_starting)
                 {
