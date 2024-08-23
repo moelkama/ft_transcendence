@@ -144,17 +144,16 @@ function disactiv_all_flexsection()
     document.getElementById('local_game_input_id').style.display = 'none';
     document.getElementById('local_or_remote').style.display = 'none';
     document.querySelector('.conteudo').style.display = 'none';
-    document.getElementById("home").style.display = 'none';
     document.getElementById('tournament_input').style.display = 'none';
+    document.getElementById("home").style.display = 'none';
+    document.getElementById("profile").style.display = 'none';
+    document.getElementById("chat").style.display = 'none';
     console.log('disactiv_all_flexsection called');
 }
 
 function    disactiv_sections()
 {
-    document.getElementById("chat").style.display = 'none';
-    document.getElementById("home").style.display = 'none';
-    document.getElementById("profile").style.display = 'none';
-    document.querySelector('.conteudo').style.display = 'none';
+    disactiv_all_flexsection();
     document.querySelectorAll('section').forEach(section => {
         section.classList.remove('active');
     });
@@ -280,7 +279,7 @@ function    tournament_info(players, section_id)
         icon.src = '/' + players[i].icon;
 
         var display_name = document.createElement("h2");
-        display_name.id = "user-display-name"
+        // display_name.id = "user-display-name"
         display_name.textContent = players[i].login;
         // display_name.textContent = i;
         container.appendChild(icon);
@@ -576,16 +575,18 @@ function    tst(section_id)
     document.getElementById('tournament_list').style.display = 'none';
     document.getElementById('play_tournament').style.display = 'none';
     document.querySelector('.conteudo').style.display = 'none';
-    document.getElementById(section_id).style.display = 'flex';
     document.getElementById('tournament_nav_list_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('tournament_nav_making_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById(section_id).style.display = 'flex';
     if (section_id == 'tournament_list')
     {
         document.getElementById('tournament_nav_list_item_id').style.cssText = 'font-size: 40px; color: #ff44e4; ';
         document.querySelector('.conteudo').style.display = 'flex';
     }
-    else
+    else if (section_id == 'play_tournament')
         document.getElementById('tournament_nav_making_item_id').style.cssText = 'font-size: 40px; color: #ff44e4; ';
+    else
+        document.getElementById('tournament_nav_NMatch_item_id').style.cssText = 'font-size: 40px; color: #ff44e4; ';
 }
 
 // import { local_game_starting } from './localgame.js';
@@ -628,9 +629,14 @@ function tournament_asid(pushState = true) {
     ///////////////////
     document.getElementById('game-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById("tournament_aside_id").style.display = 'block';
-    if (!game_starting)
+    if (!game_starting && !local_game_starting)
         document.getElementById("game_aside_id").style.display = 'none';
-    if (tournament_starting)
+    if (local_tournament_starting)
+    {
+        active_section('tournament_nav_id');
+        tst('play_tournament');
+    }
+    else if (tournament_starting)
     {
         active_section('tournament_nav_id');
         tst('tournament_list');
@@ -752,8 +758,10 @@ function serialize_Match(o)
 
 class   player
 {
-    constructor(x, y, min, max)
+    constructor(display_name, icon, x, y, min, max)
     {
+        this.display_name = display_name;
+        this.icon = icon;
         this.racket = new racket(x, y, min, max)
     }
 }
@@ -763,7 +771,7 @@ class   Match
     constructor()
     {
         this.starting = false;
-        this.players = [new player(0, (height - hh) / 2, 0, height), new player(width - ww, (height - hh) / 2, 0, height)];
+        this.players = [2 * null];
         this.b = new ball(width / 2, height / 2);
         this.team1_score = 0;
         this.team2_score = 0;
@@ -866,18 +874,34 @@ function    close_local_game()
 
 function show_local_game_Result(idx){
     close_local_game();
+
+    var winner;
+
     document.getElementById("local_display_names_msg_id").innerHTML = '';
     document.getElementById("game_aside_id").style.display = 'none';
     if (idx == 1)
     {
+        winner = match.players[0];
         document.getElementById("local_game_winner_dname_id").innerHTML = document.getElementById("2-canvas-display_name-id-0").innerHTML;
         document.getElementById("local_game_winner_icon_id").src = document.getElementById("2-canvas-icon-id-0").src;
     }
     else
     {
+        winner = match.players[1];
         document.getElementById("local_game_winner_dname_id").innerHTML = document.getElementById("2-canvas-display_name-id-1").innerHTML;
         document.getElementById("local_game_winner_icon_id").src = document.getElementById("2-canvas-icon-id-1").src;
     }
+    //////////////////////
+    if (local_tournament_starting)
+    {
+        fill_Match(ROUND + 1, MATCH_INDEX, winner);
+        MATCH_INDEX++;
+        if (MATCH_INDEX == 8 && ROUND == 0)
+            ROUND++;
+        else if (MATCH_INDEX == 4 && ROUND == 1)
+            ROUND++;
+    }
+    //////////////////////
     active_section('localresultModal');
 }
 
@@ -899,17 +923,7 @@ function    start_pause_game()
 
 function    start_local_game()
 {
-    elem = document.getElementById('2-canvas-id');
-    document.getElementById("local_game_input_id").style.display = 'none';
-    ctx = elem.getContext("2d");
-    width = elem.width
-    height = elem.height
     ///////////////
-    match = new Match();
-    document.getElementById("2-canvas-display_name-id-0").innerHTML = player1_display_name;
-    document.getElementById("2-canvas-icon-id-0").src = '/home/resrc/game/ice.png';
-    document.getElementById("2-canvas-display_name-id-1").innerHTML = player2_display_name;
-    document.getElementById("2-canvas-icon-id-1").src = '/home/resrc/game/fire.png';
     local_game_starting = true;
     game_asid();
     var countdown = 3;
@@ -962,7 +976,23 @@ function    run_local_game() {
     else if (player1_display_name === player2_display_name)
         document.getElementById("local_display_names_msg_id").innerHTML = "you can't have the same name";
     else
+    {
+        document.getElementById("2-canvas-display_name-id-0").innerHTML = player1_display_name;
+        document.getElementById("2-canvas-icon-id-0").src = '/home/resrc/game/ice.png';
+        document.getElementById("2-canvas-display_name-id-1").innerHTML = player2_display_name;
+        document.getElementById("2-canvas-icon-id-1").src = '/home/resrc/game/fire.png';
+        ////////////////
+        elem = document.getElementById('2-canvas-id');
+        document.getElementById("local_game_input_id").style.display = 'none';
+        ctx = elem.getContext("2d");
+        width = elem.width
+        height = elem.height
+        ////////////////
+        match = new Match();
+        match.set_player(new player(player1_display_name, '/home/resrc/game/ice.png', 0, (height - hh) / 2, 0, height), 0);
+        match.set_player(new player(player2_display_name, '/home/resrc/game/fire.png',1, (height - hh) / 2, 0, height), 1);
         start_local_game();
+    }
 }
 
 //########################################################################################
@@ -988,19 +1018,102 @@ function    run_local_game() {
 //########################################################################################
 //########################################################################################
 
-function    run_local_tournament()
+function    aside_hover(aside_id)
 {
-    disactiv_all_flexsection();
-    local_tournament_starting = true;
     document.getElementById('Home-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('Pr-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
-    document.getElementById('tournament-aside').style.cssText = 'font-size: 40px; color: #ff44e4; ';
+    document.getElementById('tournament-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('chat-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('notif-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('setting-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('logout-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
-    ///////////////////
     document.getElementById('game-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
-    document.getElementById("tournament_aside_id").style.display = 'block';
+
+    document.getElementById(aside_id).style.cssText = 'font-size: 40px; color: #ff44e4; ';
+}
+
+function    fill_Match(round, idx, obj)
+{
+    var container = document.getElementById(round.toString() + idx.toString());
+    var icon = document.createElement("img");
+    icon.className = "Match_icon";
+    icon.src = '/' + obj.icon;
+
+    var display_name = document.createElement("h2");
+    display_name.id = "user-display-name"
+    display_name.textContent = obj.display_name;
+    // display_name.textContent = i;
+    container.appendChild(icon);
+    container.appendChild(display_name);
+}
+
+function    fill_round(round, list)
+{
+    var Matchs = [];
+    for (let i = 0; i < list.length; i++)
+    {
+        fill_Match(round, i, list[i]);
+        if (i % 2 == 0)
+        {
+            Matchs.push(new Match());
+            Matchs[(i / 2) | 0].set_player(new player(list[i].display_name, list[i].icon, 0, (height - hh) / 2, 0, height), 0);
+        }
+        else
+        {
+            Matchs[(i / 2) | 0].set_player(new player(list[i].display_name, list[i].icon, width - ww, (height - hh) / 2, 0, height), 1);
+        }
+    }
+    return (Matchs);
+}
+
+var ROUND = 0;
+var MATCH_INDEX = 0;
+var Matchs;
+
+function    start_match()
+{
+    delete  match;
+    match = Matchs[MATCH_INDEX];
+    document.getElementById("2-canvas-display_name-id-0").innerHTML = match.players[0].login;
+    document.getElementById("2-canvas-icon-id-0").src = '/' + match.players[0].icon;
+    document.getElementById("2-canvas-display_name-id-1").innerHTML = match.players[1].login;
+    document.getElementById("2-canvas-icon-id-1").src = '/' + match.players[1].icon;
+    start_local_game();
+}
+
+function    run_local_tournament()
+{
+    local_tournament_starting = true;
+    disactiv_sections();
+    tournament_asid();
+
+    //////////////////////////////////
+    elem = document.getElementById('2-canvas-id');
+    ctx = elem.getContext("2d");
+    width = elem.width
+    height = elem.height
+    //////////////////////////////////
+    parent = document.getElementById('tournament_content');
+    parent.innerHTML = '';
+    var list = [];
+    for (let i = 0; i < 8; i++)
+    {
+        var div = document.createElement("div");
+        div.className = "student";
+
+        var img = document.createElement("img");
+        img.className = "student-icon"
+        img.src = '/home/resrc/game/fire.png';
+
+        var span = document.createElement("span");
+        span.className = "student-name";
+        span.innerHTML = 'd_name_' + (i + 1).toString();
+
+        div.appendChild(img);
+        div.appendChild(span);
+        parent.appendChild(div);
+        list[i] = {'icon':'home/resrc/game/fire.png', 'display_name':'d_name_' + (i + 1).toString()};
+    }
+    Matchs = fill_round(ROUND, list);
     active_section('tournament_nav_id');
 }

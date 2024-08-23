@@ -1,1 +1,1 @@
-white
+local_tournament_starting
