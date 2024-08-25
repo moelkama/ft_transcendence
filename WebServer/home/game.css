@@ -219,10 +219,21 @@ button {
     border-radius: 15px;
     backdrop-filter: blur(5px);
     padding: 15px;
+    height: 450px;
+    width: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 .result_class{
+    background-color: rgba(128, 128, 128, 0.349);
+    height: 100vh;
+    width: 100vw;
     position: fixed;
+    justify-content: center;
+    align-items: center;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -239,12 +250,6 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.msg_img_t{
-    background-color: white;
-    border: 1px solid white;
-    border-radius: 25px;
 }
 
 .msg_img{
@@ -286,9 +291,8 @@ button {
 }
 
 .result_img{
-    border-radius: 25px;
-    height: 250px;
-    width: 250px;
+    height: 400px;
+    width: 400px;
 }
 
 section {
@@ -394,13 +398,14 @@ section.active {
 :root {
     --cor-background: #212123;
     --cor-reflexo: rgba(255, 255, 255, 0.4);
-    --cores-dancantes: rgb(30, 219, 68), rgb(52, 170, 220), rgb(88, 86, 217),
+    /* rgb(52, 170, 220), rgb(88, 86, 217), */
+    --cores-dancantes: rgb(30, 219, 68), 
         rgb(255, 45, 83);
 }
 
 .conteudo {
     box-sizing: border-box;
-    background: linear-gradient(to right, var(--cores-dancantes));
+    background: black;
     background-color: green;
     width: 250px;
     height: auto;
@@ -532,7 +537,7 @@ section.active {
     align-items: center;
 }
 
-#game_notification_icon_id, #game_refuse_icon_id, #local_game_winner_icon_id{
+#game_notification_icon_id, #game_refuse_icon_id{
     margin-top: 5px;
     margin-bottom: 5px;
     height: 100px;
@@ -728,4 +733,36 @@ align_items_center{
 
 section {
     display: none;
+}
+
+#tournament_next_match_id{
+    height: 80%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tournament_Match_class{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* #tournament_nav_NMatch_item_id{
+    display: none;
+} */
+
+#local_tournament_winner_icon_id
+{
+    height: 200px;
+    width: 200px;
+}
+
+#local_game_winner_icon_id
+{
+    height: 200px;
+    width: 200px;
 }

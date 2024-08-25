@@ -265,6 +265,7 @@ class RacetCunsumer(AsyncWebsocketConsumer):
         else:
             self.group_name = connects[room_creater].room_name
         await self.channel_layer.group_add(self.group_name, self.channel_name)
+        self.i = 1
         if self.group_name in rooms:
             if rooms[self.group_name].players[0].user.username != self.user.username:
                 self.racket = racket(width - ww, (height - hh) / 2, 0, height)

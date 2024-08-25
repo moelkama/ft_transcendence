@@ -21,7 +21,6 @@
         <div class="fac_one">
         <div class="navbar-logo">
             <a class="logo" onclick="border_home()" data-target="home"><img src="./resrc/freecss-logo.png" alt="Logo" ></a>
-           
         </div>
         </div>
             <div class="navbar-buttons">
@@ -37,7 +36,7 @@
                 </ul>
                 <li  class="mode dark" onclick="dark()"><i class="fa-solid fa-moon"></i></li>
                 <li  class="mode light" onclick="light()"><i class="fa-regular fa-moon"></i></li>
-            </div>
+        </div>
     </nav>
     <div class="container">
         <aside>
@@ -83,8 +82,8 @@
                             <button id="play_game_id" class="home_button" onclick="local_or_remote_game('game')">play game</button>
                         </div>
                         <div class="game">
-                            <!-- onclick="local_or_remote_game('tournament')" -->
-                            <button class="home_button" onclick="run_local_tournament()">play Tournament</button>
+                            <!-- onclick="run_local_tournament()" -->
+                            <button class="home_button" onclick="local_or_remote_game('tournament')">play Tournament</button>
                         </div>
                 </div>
             </div>
@@ -359,7 +358,7 @@
                 <img id="screen_img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAGpJREFUSEvtVUEKACAIa/9/tNEhsDCYRUZg59k2dYVy+eDy/SWWQERk5QjAIIbFbhU1EUcEs1p2Tp1U15sOkuBdi9hhenCxQfMoY7GxDqygsEp1ut9tUTqgHztrsH/8B56VZLGxQWNVeXAV8rVwGd7+Wh0AAAAASUVORK5CYII="/>
             </button>
             <a class="icons"><i id="start_pause_game_id" class="fa-solid fa-pause" onclick="start_pause_game()"></i></a>
-            <span onclick="put_section('Give_Up_Game')" class="close_game">&times;</span>
+            <span id="give_up_from_game_id" onclick="put_section('Give_Up_Game')" class="close_game">&times;</span>
         </div>
         <div id="ping-pong-2" class="ping-pong">
             <div class="users">
@@ -374,19 +373,6 @@
             </div>
             <canvas id="2-canvas-id" class="canvas" width="600px" height="300px"></canvas>
         </div>
-    </div>
-</section>
-<section id="resultModal" class="result_class">
-    <div class="msg_img">
-        <h1 id="resultMessage" class="result_msg">Congration You Won!</h1>
-        <div class="center_contents">
-            <img id="result-gif" class="result_img" src="/home/resrc/game/win.gif">
-        </div>
-    </div>
-    <div class="result_buttuns">
-        <button class="Retry_button" onclick="challenge_lastone()">Retry</button>
-        <button class="Retry_button" onclick="navigate('play')">Play Random</button>
-        <button class="Home_button" onclick="border_home()">Home</button>
     </div>
 </section>
 <section id="refuse_game_id">
@@ -439,8 +425,6 @@
 
 
 
-
-
 <section id="local_tournamet_input_id" class="tournament-input">
     <div id="local_game_input" class="tournament-input-form">
         <input id="local_tournament_player1_display_name_id" class="inputt" type="text" placeholder="player1 display name" required>
@@ -451,7 +435,7 @@
         <input id="local_tournament_player6_display_name_id" class="inputt" type="text" placeholder="player6 display name" required>
         <input id="local_tournament_player7_display_name_id" class="inputt" type="text" placeholder="player7 display name" required>
         <input id="local_tournament_player8_display_name_id" class="inputt" type="text" placeholder="player8 display name" required>
-        <h3 id="local_display_names_msg_id" style="display: flex; text-align: center; margin-bottom: 10px; color: red;"></h3> 
+        <!-- <h3 id="local_display_names_msg_id" style="display: flex; text-align: center; margin-bottom: 10px; color: red;"></h3>  -->
         <button class="buttonn" onclick="run_local_tournament()">Start</button>
     </div>
 </section>
@@ -483,6 +467,20 @@
         <button id="remote_button_id" class="Home_button" style="width: 400px;">Remote</button>
     </div>
 </section>
+
+
+
+
+<section id="resultModal" class="result_class">
+    <div class="localresultModal_border">
+        <div class="msg_img">
+            <h1 id="resultMessage" class="result_msg">Congration You Won!</h1>
+            <div class="center_contents">
+                <img id="result-gif" class="result_img" src="/home/resrc/game/win.gif">
+            </div>
+        </div>
+    </div>
+</section>
 <section id="localresultModal" class="result_class">
     <div class="localresultModal_border">
         <h1 class="result_msg">Congration You Won</h1>
@@ -493,11 +491,35 @@
             <h1 id="local_game_winner_dname_id"></h1>
         </div>
     </div>
-    <div class="result_buttuns">
-        <button class="Retry_button" onclick="flex_section('local_game_input_id')">Retry</button>
-        <button class="Home_button" onclick="border_home()">Home</button>
+</section>
+<section id="win-tournament-id" class="result_class">
+    <div class="localresultModal_border">
+        <h1 class="result_msg">Congration You are The Champion</h1>
+        <div class="center_contents">
+            <img class="result_img" src="/home/resrc/game/champion.gif">
+        </div>
     </div>
 </section>
+<section id="localtournamentresultModal" class="result_class">
+    <div class="localresultModal_border">
+        <h1 class="result_msg">Congration You are The Champion</h1>
+        <div class="con">
+            <img id="local_tournament_winner_icon_id" src="/home/resrc/game/ice.png">
+        </div>
+        <div class="center_contents">
+            <h1 id="local_tournament_winner_dname_id">moelkama</h1>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+
+
+
 <section id="local_game_input_id" class="tournament-input">
     <div id="local_game_input" class="tournament-input-form">
         <input id="local_game_player1_display_name_id" class="inputt" type="text" placeholder="player1 display name" required>
@@ -529,7 +551,6 @@
     <nav class="tournament_nav">
         <a class="icons" onclick="tst('tournament_list')"><i id="tournament_nav_list_item_id" class="fa-solid fa-list-ul"></i></a>
         <a class="icons" onclick="tst('play_tournament')"><i id="tournament_nav_making_item_id" class="fa-solid fa-ranking-star"></i></a>
-        <a class="icons" onclick="tst('tournament_next_match_id')"><i id="tournament_nav_NMatch_item_id" class="fa-solid fa-ranking-star"></i></a>
         <a class="Give_Up_tournament" onclick="put_section('Give_Up_Tournament')"><i class="fa-solid fa-xmark"></i></a>
     </nav>
     <section class="tournament_section" id="tournament_list">
@@ -545,6 +566,7 @@
     <section class="tournament_section" id="play_tournament">
         <div id="tournament-id" class="tournament">
             <div class="round">
+                <!-- <h2 style="color: white;">Quarter Final</h2> -->
                 <div class="matchup">
                     <div id="00" class="player">
                     </div>
@@ -556,23 +578,29 @@
                 </div>
             </div>
             <div class="round">
+                <!-- <h2 style="color: white;">Semi Final</h2> -->
                 <div class="matchup">
                     <div id="10" class="player"></div>
                     <div id="11" class="player"></div>
                 </div>
             </div>
             <div class="final_round">
-                    <div id="20" class="player" style=" width: 150px;"></div>
-                    <h1 style="font-weight: 900;">VS</h1>
-                    <div id="21" class="player" style=" width: 150px;"></div>
+                <!-- <h2 style="color: white;">Final</h2> -->
+                <div class="center_contents">
+                    <div id="20" class="player" style="height: 60px; width: 150px;"></div>
+                    <img src="/home/resrc/game/championcup.png" style="width: 100px; height: 100px;">
+                    <div id="21" class="player" style="height: 60px; width: 150px;"></div>
+                </div>
             </div>
             <div class="round">
+                <!-- <h2 style="color: white;">Semi Final</h2> -->
                 <div class="matchup">
                     <div id="12" class="player"></div>
                     <div id="13" class="player"></div>
                 </div>
             </div>
             <div class="round">
+                <!-- <h2 style="color: white;">Quarter Final</h2> -->
                 <div class="matchup">
                     <div id="04" class="player"></div>
                     <div id="05" class="player"></div>
@@ -585,7 +613,21 @@
         </div>
     </section>
     <section id="tournament_next_match_id">
-        <button class="buttonn" onclick="start_match()">Start</button>
+        <div class="tournament_Match_class">
+            <h2 id="Match_round_id" style="color: white;"></h2>
+            <div class="fighters">
+                <div class="fighter1">
+                    <h1 id="tournament_fighter_username_0"></h1>
+                    <img id="tournament_fighter_icon_0" class="icon">
+                </div>
+                <div class="vs">vs</div>
+                <div class="fighter2">
+                    <img id="tournament_fighter_icon_1" class="icon">
+                    <h1 id="tournament_fighter_username_1"></h1>
+                </div>
+            </div>
+            <button class="Continue" onclick="start_match()">Start</button>
+        </div>
     </section>
 </section>
 
@@ -595,19 +637,7 @@
 
 
 
-<section id="win-tournament-id">
-    <div class="msg_img_t">
-        <h1 class="result_msg">Congration You are the champion!</h1>
-        <div class="center_contents">
-            <img class="result_img" src="/home/resrc/game/champion.gif">
-        </div>
-    </div>
-    <div class="result_buttuns">
-        <button class="Retry_button" onclick="challenge_lastone()">Retry</button>
-        <button class="Retry_button" onclick="navigate('play')">Play Random</button>
-        <button class="Home_button" onclick="border_home()">Home</button>
-    </div>
-</section>
+
 <section id="game_notification_id" class="game_notification">
     <img id="game_notification_icon_id" class="icon">
     <h2 id="game_notification_username_id" class="display-name"></h2>
@@ -645,7 +675,7 @@
         <h3 id="already_in_game_exmsg_id" style="color: red"></h2>
         <div class="buttonss">
             <button id="already_in_game_continue_id" class="Continue" >Continue</button>
-            <button id="already_in_game_new_id" class="Continue">New</button>
+            <button id="already_in_game_new_id" class="Continue" onclick="close_AI()">Give Up</button>
         </div>
     </div>
 </section>
@@ -653,9 +683,8 @@
     <div class="Give_Up_Game_class" onclick="disactiv_section('Give_Up_Game')">
         <div class="already_in_game_class">
             <h2 style="color: #ff9800">Are you shure you want to Giv Up from the Game?<h2>
-            <h3 style="color: red">automaticly you are lose</h3>
             <div class="buttonss">
-                <button class="Give_Up" onclick="close_game()">Shure</button>
+                <button class="Give_Up" onclick="close_AI()">Shure</button>
                 <button class="Continue" onclick="disactiv_section('Give_Up_Game')">Stay</button>
             </div>
         </div>
@@ -665,9 +694,8 @@
     <div class="Give_Up_Game_class" onclick="disactiv_section('Give_Up_Tournament')">
         <div class="already_in_game_class">
             <h2 style="color: #ff9800">Are you shure you want to Giv Up from the Tournament?<h2>
-            <h3 style="color: red">automaticly you are lose</h3>
             <div class="buttonss">
-                <button class="Give_Up" onclick="close_tournament()">Shure</button>
+                <button class="Give_Up" onclick="close_AI()">Shure</button>
                 <button class="Continue" onclick="disactiv_section('Give_Up_Tournament')">Stay</button>
             </div>
         </div>

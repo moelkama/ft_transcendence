@@ -9,8 +9,8 @@ var height = null;
 //////////////
 var hh = 80
 var ww = 5
-var racket_speed = 1
-var score_to_win = 3
+var racket_speed = 2
+var score_to_win = 1
 var local_game_starting = false;
 var local_game_Interval = null;
 var local_game_Interval_starting = false;
@@ -148,7 +148,13 @@ function disactiv_all_flexsection()
     document.getElementById("home").style.display = 'none';
     document.getElementById("profile").style.display = 'none';
     document.getElementById("chat").style.display = 'none';
-    console.log('disactiv_all_flexsection called');
+    document.getElementById("localtournamentresultModal").style.display = 'none';
+    document.getElementById('localresultModal').style.display = 'none';
+}
+
+function    active_flexsection(section_id)
+{
+    document.getElementById(section_id).style.display = 'flex';
 }
 
 function    disactiv_sections()
@@ -159,24 +165,33 @@ function    disactiv_sections()
     });
 }
 
+function    remove_all_event_listener(id)
+{
+    var element = document.getElementById(id);
+    var newElement = element.cloneNode(true);
+    element.parentNode.replaceChild(newElement, element);
+}
+
 function    local_or_remote_game(type)
 {
     if (type == 'game')
     {
-        document.getElementById('local_button_id').addEventListener('click', (e)=>{flex_section('local_game_input_id')});
-        document.getElementById('remote_button_id').addEventListener('click', function() {navigate('play')});
+        document.getElementById('local_button_id').addEventListener('click', ()=>{close_AI();flex_section('local_game_input_id')});
+        document.getElementById('remote_button_id').addEventListener('click', function() {close_AI();navigate('play')});
     }
     else
     {
-        document.getElementById('local_button_id').addEventListener('click', (e)=>{flex_section('local_tournamet_input_id')});
-        document.getElementById('remote_button_id').addEventListener('click', function() {navigate('play_tournament')});
+        //////////////////////    3andak tnssa ra hadi hiya alasliya
+        // document.getElementById('local_button_id').addEventListener('click', (e)=>{flex_section('local_tournamet_input_id')});
+        //////////////////////
+        document.getElementById('local_button_id').addEventListener('click', ()=>{close_AI();run_local_tournament()});
+        document.getElementById('remote_button_id').addEventListener('click', ()=> {close_AI();navigate('tournament_input')});
     }
     flex_section('local_or_remote');
 }
 
 function    flex_section(section_id)
 {
-    console.log('flex_section called', section_id);
     disactiv_sections();
     document.getElementById('local_or_remote').style.display = 'none';
     document.getElementById(section_id).style.display = 'flex';
@@ -262,6 +277,18 @@ function    refuse_game()
     main_socket.send(JSON.stringify({'type':'room.refuse', 'vs':document.getElementById('game_notification_username_id').innerHTML}));
 }
 
+function    clean_rounds()
+{
+    for (let i = 0; i < 8; i++)
+    {
+        document.getElementById('0' + i.toString()).innerHTML = '';
+        if (i < 4)
+            document.getElementById('1' + i.toString()).innerHTML = '';
+        if (i < 2)
+            document.getElementById('2' + i.toString()).innerHTML = '';
+    }
+}
+
 // function closeModal(id) {
 //     disactiv_sections();
 //     document.getElementById("home").style.display = 'flex';
@@ -290,7 +317,6 @@ function    tournament_info(players, section_id)
 
 function    tournament_list(data)
 {
-    // history.pushState(null, '', '/tournamet/');
     document.getElementById('tournament_input').style.display = 'none';
     parent = document.getElementById('tournament_content');
     parent.innerHTML = '';
@@ -400,15 +426,21 @@ async function run(section_id, socket_url, canvas_id, type)
 function    close_game(return_to_home = true)
 {
     document.getElementById("game_aside_id").style.display = 'none';
-    // document.getElementById("tournament_aside_id").style.display = 'none';
     if (return_to_home)
         border_home();
-    game_starting = false;
-    game_socket.close(1000, 'Normal Closure');
+    if (local_game_starting)
+    {
+        local_game_starting = false;
+        clearInterval(local_game_Interval);
+    }
+    if (game_starting)
+    {
+        game_starting = false;
+        game_socket.close(1000, 'Normal Closure');
+    }
 }
 
 function new_game(){
-    console.log('new_game called');
     close_game(false);
     tournament_starting = false;
     if (tournament_starting)
@@ -437,32 +469,9 @@ function new_tournament()
 function navigate(section_id) {
     if (section_id == 'play')
     {
-        if (tournament_starting)
-        {
-            document.getElementById('already_in_game_wrmsg_id').innerText = "You are already in a Tournament";
-            document.getElementById('already_in_game_exmsg_id').innerText = "if you chose to play new Tournament, automaticly you lose the previuse one";
-            document.getElementById('already_in_game_continue_id').removeEventListener('click', game_asid);
-            document.getElementById('already_in_game_new_id').removeEventListener('click', new_tournament);
-            document.getElementById('already_in_game_continue_id').addEventListener('click', tournament_asid);
-            document.getElementById('already_in_game_new_id').addEventListener('click', new_game);
-            put_section('already_in_game_id');
-        }
-        else if (game_starting)
-        {
-            document.getElementById('already_in_game_wrmsg_id').innerText = "You are already in a game";
-            document.getElementById('already_in_game_exmsg_id').innerText = "if you chose to play new Game, automaticly you lose the previuse one";
-            document.getElementById('already_in_game_continue_id').removeEventListener('click', tournament_asid);
-            document.getElementById('already_in_game_new_id').removeEventListener('click', new_tournament);
-            document.getElementById('already_in_game_continue_id').addEventListener('click', game_asid);
-            document.getElementById('already_in_game_new_id').addEventListener('click', new_game);
-            put_section('already_in_game_id');
-        }
-        else
-        {
-            game_asid(false);
-            document.getElementById("tournament_aside_id").style.display = 'none';
-            run('play', '/wss/game/', '2-canvas-id', {'type':'random', 'vs':'undefined'});
-        }
+        game_asid(false);
+        document.getElementById("tournament_aside_id").style.display = 'none';
+        run('play', '/wss/game/', '2-canvas-id', {'type':'random', 'vs':'undefined'});
     }
     else if (section_id == 'play_tournament')
     {
@@ -478,33 +487,7 @@ function navigate(section_id) {
         run('play-4', '/wss/four_players/', '4-canvas-id', {'type':'random', 'vs':'undefined'});
     }
     else if (section_id == 'tournament_input')
-    {
-        if (tournament_starting)
-        {
-            // document.getElementById('already_in_game_continue_id')._listeners = [];
-            // document.getElementById('already_in_game_new_id')._listeners = [];
-            document.getElementById('already_in_game_wrmsg_id').innerText = "You are already in a Tournament";
-            document.getElementById('already_in_game_exmsg_id').innerText = "if you chose to play new Tournament, automaticly you lose the previuse one";
-            document.getElementById('already_in_game_continue_id').removeEventListener('click', game_asid);
-            document.getElementById('already_in_game_new_id').removeEventListener('click', new_game);
-            document.getElementById('already_in_game_continue_id').addEventListener('click', tournament_asid);
-            document.getElementById('already_in_game_new_id').addEventListener('click', new_tournament);
-            console.log('---------------------tournament_input---------------------');
-            put_section('already_in_game_id');
-        }
-        else if (game_starting)
-        {
-            document.getElementById('already_in_game_wrmsg_id').innerText = "You are already in a game";
-            document.getElementById('already_in_game_exmsg_id').innerText = "if you chose to play new Game, automaticly you lose the previuse one";
-            document.getElementById('already_in_game_continue_id').removeEventListener('click', game_asid);
-            document.getElementById('already_in_game_continue_id').addEventListener('click', tournament_asid);
-            document.getElementById('already_in_game_new_id').removeEventListener('click', new_game);
-            document.getElementById('already_in_game_new_id').addEventListener('click', new_tournament);
-            put_section('already_in_game_id');
-        }
-        else
-            tournament_asid();
-    }
+        tournament_asid();
     else
         active_section(section_id);
 }
@@ -577,6 +560,7 @@ function    tst(section_id)
     document.querySelector('.conteudo').style.display = 'none';
     document.getElementById('tournament_nav_list_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('tournament_nav_making_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('tournament_nav_NMatch_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById(section_id).style.display = 'flex';
     if (section_id == 'tournament_list')
     {
@@ -730,7 +714,7 @@ class ball
         this.y = y;
         this.r = 10;
         this.angl = 0;
-        this.speed = 1.5;
+        this.speed = 1.8;
         this.vx = Math.cos(this.angl * Math.PI / 180) * this.speed;
         this.vy = Math.sin(this.angl * Math.PI / 180) * this.speed;
     }
@@ -789,9 +773,9 @@ class   Match
             this.team1_score += 1;
             this.b.x = width / 2;
             this.b.y = height / 2;
-            setTimeout(() => {
-                console.log('End after 2 seconds');
-              }, 1000);
+            // setTimeout(() => {
+            //     console.log('End after 2 seconds');
+            //   }, 1000);
             //sleep 1 s;
         }
         if (this.b.x - this.b.r > width - ww)
@@ -799,9 +783,9 @@ class   Match
             this.team2_score += 1;
             this.b.x = width / 2;
             this.b.y = height / 2;
-            setTimeout(() => {
-                console.log('End after 2 seconds');
-              }, 1000);
+            // setTimeout(() => {
+            //     console.log('End after 2 seconds');
+            //   }, 1000);
         }
         if (this.b.vx > 0)
         {
@@ -866,10 +850,37 @@ class   Match
 
 function    close_local_game()
 {
+    document.getElementById("game_aside_id").style.display = 'none';
+    if (ctx)
+        ctx.clearRect(0, 0, width, height);
     clearInterval(local_game_Interval);
     delete match;
     local_game_starting = false;
     local_game_Interval_starting = false;
+}
+
+function    close_local_tournament()
+{
+    document.getElementById("tournament_aside_id").style.display = 'none';
+    close_local_game();
+    clean_rounds();
+    local_tournament_starting = false;
+    TOURNAMENT_LIST = [];
+    Matchs = [];
+    MATCH_INDEX = 0;
+    ROUND = 0;
+}
+
+function    close_AI()
+{
+    if (tournament_starting)
+        close_tournament();
+    else if (game_starting)
+        close_game();
+    else if (local_tournament_starting)
+        close_local_tournament();
+    else if (local_game_starting)
+        close_local_game();
 }
 
 function show_local_game_Result(idx){
@@ -894,15 +905,38 @@ function show_local_game_Result(idx){
     //////////////////////
     if (local_tournament_starting)
     {
-        fill_Match(ROUND + 1, MATCH_INDEX, winner);
-        MATCH_INDEX++;
-        if (MATCH_INDEX == 8 && ROUND == 0)
-            ROUND++;
-        else if (MATCH_INDEX == 4 && ROUND == 1)
-            ROUND++;
+        if (ROUND < 2)
+        {
+            fill_Match(ROUND + 1, MATCH_INDEX, winner);
+            TOURNAMENT_LIST.push({'icon':winner.icon, 'display_name':winner.display_name});
+            MATCH_INDEX++;
+            if ((MATCH_INDEX == 4 && ROUND == 0) || (MATCH_INDEX == 2 && ROUND == 1))
+            {
+                ROUND++;
+                MATCH_INDEX = 0;
+                Matchs = fill_round(ROUND, TOURNAMENT_LIST, false);
+            }
+            fill_Match_fight(Matchs[MATCH_INDEX]);
+            active_section('localresultModal');
+            document.getElementById('localresultModal').style.display = 'flex';
+        }
+        else
+        {
+            close_local_tournament();
+            document.getElementById("local_tournament_winner_dname_id").innerHTML = winner.display_name;
+            document.getElementById("local_tournament_winner_icon_id").src = winner.icon;
+            
+            document.getElementById('localtournamentresultModal').style.display = 'flex';
+        }
+        setTimeout(() => {tournament_asid()}, 3000);
+        // document.getElementById('give_up_from_game_id').style.display = 'block';
     }
     //////////////////////
-    active_section('localresultModal');
+    else
+    {
+        document.getElementById('localresultModal').style.display = 'flex';
+        setTimeout(() => {border_home()}, 2000);
+    }
 }
 
 function    start_pause_game()
@@ -940,33 +974,32 @@ function    start_local_game()
         local_game_Interval_starting = true;
         document.addEventListener("keydown", (event) => {
             if (local_game_starting)
-                {
-                    if (event.key == "ArrowUp")
-                        match.players[0].racket.change_direction('Up');
-                    else if (event.key == "ArrowDown")
-                        match.players[0].racket.change_direction('Down');
-                    else if (event.key == "w")
-                        match.players[1].racket.change_direction('Up');
-                    else if (event.key == "s")
-                match.players[1].racket.change_direction('Down');
-        }
+            {
+                if (event.key == "ArrowUp")
+                    match.players[1].racket.change_direction('Up');
+                else if (event.key == "ArrowDown")
+                    match.players[1].racket.change_direction('Down');
+                else if (event.key == "w")
+                    match.players[0].racket.change_direction('Up');
+                else if (event.key == "s")
+                    match.players[0].racket.change_direction('Down');
+            }
         });
         
         document.addEventListener("keyup", (event) => {
             if (local_game_starting)
-                {
-                    if (event.key == "ArrowUp" || event.key == "ArrowDown")
-                        match.players[0].racket.change_direction('Stop');
-                    else if (event.key == "w" || event.key == "s")
-                        match.players[1].racket.change_direction('Stop');
-                }
-            });
-        }, 4000);
+            {
+                if (event.key == "ArrowUp" || event.key == "ArrowDown")
+                    match.players[1].racket.change_direction('Stop');
+                else if (event.key == "w" || event.key == "s")
+                    match.players[0].racket.change_direction('Stop');
+            }
+        });
+    }, 4000);
 }
 
 function    run_local_game() {
-    console.log("run_local_game start");
-    close_local_game();
+    close_AI();
     var player1_display_name = document.getElementById("local_game_player1_display_name_id").value;
     var player2_display_name = document.getElementById("local_game_player2_display_name_id").value;
     if (player1_display_name.length > 10)
@@ -990,7 +1023,7 @@ function    run_local_game() {
         ////////////////
         match = new Match();
         match.set_player(new player(player1_display_name, '/home/resrc/game/ice.png', 0, (height - hh) / 2, 0, height), 0);
-        match.set_player(new player(player2_display_name, '/home/resrc/game/fire.png',1, (height - hh) / 2, 0, height), 1);
+        match.set_player(new player(player2_display_name, '/home/resrc/game/fire.png', width - ww, (height - hh) / 2, 0, height), 1);
         start_local_game();
     }
 }
@@ -1034,25 +1067,31 @@ function    aside_hover(aside_id)
 
 function    fill_Match(round, idx, obj)
 {
-    var container = document.getElementById(round.toString() + idx.toString());
-    var icon = document.createElement("img");
-    icon.className = "Match_icon";
-    icon.src = '/' + obj.icon;
+    if (round <= 2)
+    {
+        var container = document.getElementById(round.toString() + idx.toString());
+        var icon = document.createElement("img");
+        icon.className = "Match_icon";
+        icon.src = '/' + obj.icon;
 
-    var display_name = document.createElement("h2");
-    display_name.id = "user-display-name"
-    display_name.textContent = obj.display_name;
-    // display_name.textContent = i;
-    container.appendChild(icon);
-    container.appendChild(display_name);
+        var display_name = document.createElement("h2");
+        display_name.id = "user-display-name"
+        display_name.textContent = obj.display_name;
+        // display_name.textContent = i;
+        container.appendChild(icon);
+        container.appendChild(display_name);
+        document.getElementsByClassName('tournament_nav').appendChild(container);
+        <a class="icons" onclick="tst('tournament_next_match_id')"><i id="tournament_nav_NMatch_item_id" class="fa-solid fa-ranking-star"></i></a>
+    }
 }
 
-function    fill_round(round, list)
+function    fill_round(round, list, fill = true)
 {
     var Matchs = [];
     for (let i = 0; i < list.length; i++)
     {
-        fill_Match(round, i, list[i]);
+        if (fill)
+            fill_Match(round, i, list[i]);
         if (i % 2 == 0)
         {
             Matchs.push(new Match());
@@ -1070,16 +1109,38 @@ var ROUND = 0;
 var MATCH_INDEX = 0;
 var Matchs;
 
+function    fill_Match_fight(match)
+{
+    document.getElementById("tournament_fighter_username_0").innerHTML = match.players[0].display_name;
+    document.getElementById("tournament_fighter_icon_0").src = '/' + match.players[0].icon;
+    document.getElementById("tournament_fighter_username_1").innerHTML = match.players[1].display_name;
+    document.getElementById("tournament_fighter_icon_1").src = '/' + match.players[1].icon;
+
+    if (ROUND == 0)
+        document.getElementById('Match_round_id').innerHTML = 'Quarter Final';
+    else if (ROUND == 1)
+        document.getElementById('Match_round_id').innerHTML = 'Semi Final';
+    else
+        document.getElementById('Match_round_id').innerHTML = 'Final';
+
+    document.getElementById('tournament_nav_NMatch_item_id').style.display = 'block';
+}
+
 function    start_match()
 {
-    delete  match;
+    delete match;
     match = Matchs[MATCH_INDEX];
-    document.getElementById("2-canvas-display_name-id-0").innerHTML = match.players[0].login;
+    document.getElementById("2-canvas-display_name-id-0").innerHTML = match.players[0].display_name;
     document.getElementById("2-canvas-icon-id-0").src = '/' + match.players[0].icon;
-    document.getElementById("2-canvas-display_name-id-1").innerHTML = match.players[1].login;
+    document.getElementById("2-canvas-display_name-id-1").innerHTML = match.players[1].display_name;
     document.getElementById("2-canvas-icon-id-1").src = '/' + match.players[1].icon;
+    
+    // document.getElementById('give_up_from_game_id').style.display = 'none';
     start_local_game();
+    // document.getElementById('tournament_nav_NMatch_item_id').style.display = 'none';
 }
+
+var TOURNAMENT_LIST = [];
 
 function    run_local_tournament()
 {
@@ -1095,7 +1156,6 @@ function    run_local_tournament()
     //////////////////////////////////
     parent = document.getElementById('tournament_content');
     parent.innerHTML = '';
-    var list = [];
     for (let i = 0; i < 8; i++)
     {
         var div = document.createElement("div");
@@ -1103,7 +1163,7 @@ function    run_local_tournament()
 
         var img = document.createElement("img");
         img.className = "student-icon"
-        img.src = '/home/resrc/game/fire.png';
+        img.src = '/home/resrc/game/minion' + (i + 1).toString() + '.png';
 
         var span = document.createElement("span");
         span.className = "student-name";
@@ -1112,8 +1172,10 @@ function    run_local_tournament()
         div.appendChild(img);
         div.appendChild(span);
         parent.appendChild(div);
-        list[i] = {'icon':'home/resrc/game/fire.png', 'display_name':'d_name_' + (i + 1).toString()};
+        TOURNAMENT_LIST[i] = {'icon':'home/resrc/game/minion' + (i + 1).toString() + '.png', 'display_name':'d_name_' + (i + 1).toString()};
     }
-    Matchs = fill_round(ROUND, list);
+    Matchs = fill_round(ROUND, TOURNAMENT_LIST);
+    fill_Match_fight(Matchs[MATCH_INDEX]);
+    TOURNAMENT_LIST = [];
     active_section('tournament_nav_id');
 }
