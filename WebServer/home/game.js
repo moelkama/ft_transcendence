@@ -15,6 +15,7 @@ var local_game_starting = false;
 var local_game_Interval = null;
 var local_game_Interval_starting = false;
 var local_tournament_starting = false;
+var four_game_starting = false;
 //////////////
 var lastone = "undefinded"
 var game_starting = false;
@@ -482,6 +483,7 @@ function navigate(section_id) {
     }
     else if (section_id == 'ping-pong-4')
     {
+        // four_game_starting = true;
         active_section('loading-section-id');
         document.getElementById("tournament_aside_id").style.display = 'none';
         run('play-4', '/wss/four_players/', '4-canvas-id', {'type':'random', 'vs':'undefined'});
@@ -594,6 +596,8 @@ function game_asid(pushState = true) {
     document.getElementById("game_aside_id").style.display = 'block';
     if (game_starting || local_game_starting)
         active_section('play');
+    else if (four_game_starting)
+        active_section('play-4');
     else
         active_section('loading-section-id');
 }
@@ -1081,7 +1085,7 @@ function    fill_Match(round, idx, obj)
         container.appendChild(icon);
         container.appendChild(display_name);
         document.getElementsByClassName('tournament_nav').appendChild(container);
-        <a class="icons" onclick="tst('tournament_next_match_id')"><i id="tournament_nav_NMatch_item_id" class="fa-solid fa-ranking-star"></i></a>
+        // <a class="icons" onclick="tst('tournament_next_match_id')"><i id="tournament_nav_NMatch_item_id" class="fa-solid fa-ranking-star"></i></a>
     }
 }
 
