@@ -75,17 +75,16 @@
                         <h1> Choose <span class="span">a</span> game  <span class="span">mode</span></h1>
                     </div>
                     <div class="play">
-                        <!-- <div class="game">
-                            <button id="play_local_game_id" onclick="flex_section('local_game_input_id')" class="home_button">local</button>
-                        </div> -->
-                    <div class="game">
-                            <button id="play_game_id" class="home_button" onclick="local_or_remote_game('game')">play game</button>
+                        <div class="game">
+                            <button id="play_game_id" class="home_button" onclick="local_or_remote_game('game')">Start game</button>
                         </div>
                         <div class="game">
-                            <!-- onclick="run_local_tournament()" -->
-                            <button class="home_button" onclick="local_or_remote_game('tournament')">play Tournament</button>
+                            <button id="play_game_id" class="home_button" onclick="navigate('ping-pong-4')">4 players game</button>
                         </div>
-                </div>
+                        <div class="game">
+                            <button class="home_button" onclick="local_or_remote_game('tournament')">Start Tournament</button>
+                        </div>
+                    </div>
             </div>
                 <div class="challenge">
                     <div class="center">
@@ -389,6 +388,13 @@
     </div> -->
 </section>
 <section id="play-4" >
+    <div class="game_nav">
+        <button o id="toggle-btn">
+            <img id="screen_img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAGpJREFUSEvtVUEKACAIa/9/tNEhsDCYRUZg59k2dYVy+eDy/SWWQERk5QjAIIbFbhU1EUcEs1p2Tp1U15sOkuBdi9hhenCxQfMoY7GxDqygsEp1ut9tUTqgHztrsH/8B56VZLGxQWNVeXAV8rVwGd7+Wh0AAAAASUVORK5CYII="/>
+        </button>
+        <a class="icons"><i id="start_pause_game_id" class="fa-solid fa-pause" onclick="start_pause_game()"></i></a>
+        <span id="give_up_from_game_id" onclick="put_section('Give_Up_Game')" class="close_game">&times;</span>
+    </div>
     <div class="ping-pong">
         <div class="users">
             <div class="user1">
