@@ -81,8 +81,7 @@ async def four_players_game(users):
         rooms[group_name].set_player(u, i)
         i += 1
     print("-------------------------task start-------------------------")
-    await send_to_group(rooms[group_name].players, {'data':json.dumps(rooms[group_name], default=serialize_Users)});
-    await asyncio.sleep(50)
+    # await send_to_group(rooms[group_name].players, {'data':json.dumps(rooms[group_name], default=serialize_Users)});
     winners = await rooms[group_name].run_game()
     result = [None] * 2
     result[0] = 'Winner' if winners == 1 else 'Loser'
@@ -98,10 +97,10 @@ async def four_players_game(users):
             await rooms[group_name].players[i].close()
     del rooms[group_name]
 
-x = 0
+# x = 0
 class   four_players(AsyncWebsocketConsumer):
     async def connect(self):
-        global x
+        # global x
         print("--------------four_players---------------")
         await self.accept()
         self.avaible = True
@@ -113,11 +112,17 @@ class   four_players(AsyncWebsocketConsumer):
         token = f.decrypt(add_padding(token).encode()).decode()
         data = endpoint(token, id)
         self.user = User(data)
-        # waiting[self.user.username] = self
-        waiting[str(x)] = self
-        x += 1
+        if (self.user.username in waiting):
+            await waiting[self.user.username].send(json.dumps({'type':'discard', 'game_type':'four_players_game'}))
+            del waiting[self.user.username]
+            # await waiting[self.user.username].close()
+        waiting[self.user.username] = self
+        # waiting[str(x)] = self
+        # x += 1
+        for u in waiting.values():
+            await u.send(json.dumps({'type':'game_wait', 'waiting':N - len(waiting)}))
         if len(waiting) == N:
-            x = 0
+            # x = 0
             asyncio.create_task(four_players_game(list(waiting.values())))
             waiting.clear()
 
@@ -134,3 +139,5 @@ class   four_players(AsyncWebsocketConsumer):
         self.avaible = False
         if self.user.username in waiting:
             del waiting[self.user.username]
+            for u in waiting.values():
+                await u.send(json.dumps({'type':'game_wait', 'waiting':N - len(waiting)}))

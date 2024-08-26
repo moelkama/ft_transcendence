@@ -355,6 +355,7 @@ async function run(section_id, socket_url, canvas_id, type)
         URL = await get_url(socket_url) + '&type=' + type.type + '&room_creater=' + type.room_creater
         game_socket = new WebSocket(URL);
 
+        console.log('canvas_id:::::', canvas_id);
         game_socket.onopen = function(event) {
             console.log("game WebSocket connection established.");
         };
@@ -362,14 +363,35 @@ async function run(section_id, socket_url, canvas_id, type)
         game_socket.onmessage = function (e)
         {
             var data = JSON.parse(e.data)
-            if (data.type == 'game.info')
+            console.log('data', data);
+            if (data.type == 'game_wait')
+                document.getElementById('waiting_id').innerHTML = 'waiting for '+ data.waiting + ' others ...';
+            else if (data.type == 'discard')
+            {
+                // document.getElementById('discard_game_id').style.display = 'block';
+                border_home();
+                put_section('discard_game_id');
+                // document.getElementById('game-asid').style.display = 'none';
+                setTimeout(() => {document.getElementById('discard_game_id').style.display = 'none';}, 8000);
+            }
+            else if (data.type == 'game.info')
                 display_ping_pong(data);
             else if (data.type == 'game.state')
             {
                 if (first_time)
                 {
+                    ctx.clearRect(0, 0, width, height);
+                    console.log('data', data);
+                    for (let i = 0; i < data.players.length; i++)
+                    {
+                        document.getElementById(data.players.length.toString() + "-canvas-display_name-id-" + i.toString()).innerHTML = data.players[i].login;
+                        document.getElementById(data.players.length.toString() + "-canvas-icon-id-" + i.toString()).src = '/' + data.players[i].icon;
+                    }
                     first_time = false;
-                    game_starting = true;
+                    if (data.players.length == 2)
+                        game_starting = true;
+                    else if (data.players.length == 4)
+                        four_game_starting = true;
                     game_asid(false);
                     // active_section(section_id);
                     var countdown = 3;
@@ -483,7 +505,6 @@ function navigate(section_id) {
     }
     else if (section_id == 'ping-pong-4')
     {
-        // four_game_starting = true;
         active_section('loading-section-id');
         document.getElementById("tournament_aside_id").style.display = 'none';
         run('play-4', '/wss/four_players/', '4-canvas-id', {'type':'random', 'vs':'undefined'});
@@ -855,12 +876,16 @@ class   Match
 function    close_local_game()
 {
     document.getElementById("game_aside_id").style.display = 'none';
-    if (ctx)
+    if (local_game_starting)
+    {
+        console.log('close_local_game called', border_home);
         ctx.clearRect(0, 0, width, height);
+        delete match;
+        local_game_starting = false;
+    }
     clearInterval(local_game_Interval);
-    delete match;
-    local_game_starting = false;
     local_game_Interval_starting = false;
+    border_home();
 }
 
 function    close_local_tournament()
@@ -879,12 +904,14 @@ function    close_AI()
 {
     if (tournament_starting)
         close_tournament();
-    else if (game_starting)
+    if (game_starting)
         close_game();
-    else if (local_tournament_starting)
+    if (local_tournament_starting)
         close_local_tournament();
-    else if (local_game_starting)
+    if (local_game_starting)
         close_local_game();
+    if (four_game_starting)
+        close_game();
 }
 
 function show_local_game_Result(idx){
@@ -945,23 +972,28 @@ function show_local_game_Result(idx){
 
 function    start_pause_game()
 {
-    if (local_game_Interval_starting)
+    if (local_game_starting)
     {
-        local_game_Interval_starting = false;
-        clearInterval(local_game_Interval);
-        document.getElementById("start_pause_game_id").className = 'fa-solid fa-play';
-    }
-    else
-    {
-        local_game_Interval_starting = true;
-        local_game_Interval = setInterval(match.run_game);
-        document.getElementById("start_pause_game_id").className = 'fa-solid fa-pause';
+        if (local_game_Interval_starting)
+        {
+            local_game_Interval_starting = false;
+            clearInterval(local_game_Interval);
+            document.getElementById("start_pause_game_id").className = 'fa-solid fa-play';
+        }
+        else
+        {
+            local_game_Interval = setInterval(match.run_game);
+            local_game_Interval_starting = true;
+            document.getElementById("start_pause_game_id").className = 'fa-solid fa-pause';
+        }
     }
 }
 
 function    start_local_game()
 {
     ///////////////
+    clearInterval(local_game_Interval);
+    local_game_Interval_starting = false;
     local_game_starting = true;
     game_asid();
     var countdown = 3;

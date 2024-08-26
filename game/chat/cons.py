@@ -127,6 +127,8 @@ class   Match:
             player.racket.move()
 
     async def run_game(self):
+        await send_to_group(self.players, {'data':json.dumps(self, default=serialize_Match)})
+        await asyncio.sleep(4)
         while self.players[0].avaible and self.players[1].avaible:
             self.move()
             await send_to_group(self.players, {'data':json.dumps(self, default=serialize_Match)})
@@ -140,11 +142,6 @@ class   Match:
             if (self.team2_score == score_to_win):
                 return 2
             await asyncio.sleep(0.001)
-        # if self.players[0].avaible:
-        #     self.team1_score = score_to_win
-        #     return 2
-        # self.team2_score = score_to_win
-        # return 1
 
 async def send_to_group(group, data):
     for channel in group:
@@ -219,7 +216,7 @@ async def start_game(group_name):
 def serialize_Match(o):
     return{
         'type':'game.state',
-        'players':[{'racket':p.racket.serialize_racket()} for p in o.players],
+        'players':[{'login':p.user.username, 'icon':p.user.photo_profile, 'racket':p.racket.serialize_racket()} for p in o.players],
         'ping':o.b.serialize_ball(),
         'team1_score':o.team1_score,
         'team2_score':o.team2_score,
@@ -266,6 +263,13 @@ class RacetCunsumer(AsyncWebsocketConsumer):
             self.group_name = connects[room_creater].room_name
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         self.i = 1
+        for room in rooms.values():
+            if room.players[0] and room.players[0].user.username == self.user.username:
+                await room.players[0].send(json.dumps({'type':'discard', 'game_type':'four_players_game'}))
+                room.players[0] = self
+            if (self.user.username in waiting):
+                await waiting[self.user.username].send(json.dumps({'type':'discard', 'game_type':'four_players_game'}))
+                del waiting[self.user.username]
         if self.group_name in rooms:
             if rooms[self.group_name].players[0].user.username != self.user.username:
                 self.racket = racket(width - ww, (height - hh) / 2, 0, height)
