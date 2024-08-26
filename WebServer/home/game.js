@@ -104,7 +104,10 @@ async function get_url(socket_url) {
             {
                 document.getElementById('game_refuse_icon_id').src = '/'  + data.vs.icon;
                 document.getElementById('game_refuse_username_id').innerHTML = data.vs.login;
-                active_section('refuse_game_id');
+                border_home();
+                console.log('game.refuse++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+                put_section('refuse_game_id');
+                setTimeout(() => {disactiv_section('refuse_game_id')}, 2500);
             }
         };
 
@@ -175,6 +178,8 @@ function    remove_all_event_listener(id)
 
 function    local_or_remote_game(type)
 {
+    remove_all_event_listener('local_button_id');
+    remove_all_event_listener('remote_button_id');
     if (type == 'game')
     {
         document.getElementById('local_button_id').addEventListener('click', ()=>{close_AI();flex_section('local_game_input_id')});
@@ -243,14 +248,9 @@ function showResult(result)
         document.getElementById('result-gif').src = "/home/resrc/game/lost.png";
         game_socket.close(1000, 'Normal Closure');
     }
-    active_section('resultModal');
-    elem = document.getElementById('');
-    if (element._listeners) {
-        element._listeners.forEach(listener => {
-          element.removeEventListener(listener.event, listener.handler);
-        });
-        element._listeners = []; // Clear the listeners array
-      }
+    document.getElementById('waiting_id').innerHTML = '';
+    put_section('resultModal');
+    setTimeout(() => {border_home();}, 2500);
 }
 
 function Continue_game(action)
@@ -368,11 +368,21 @@ async function run(section_id, socket_url, canvas_id, type)
                 document.getElementById('waiting_id').innerHTML = 'waiting for '+ data.waiting + ' others ...';
             else if (data.type == 'discard')
             {
-                // document.getElementById('discard_game_id').style.display = 'block';
                 border_home();
                 put_section('discard_game_id');
                 // document.getElementById('game-asid').style.display = 'none';
-                setTimeout(() => {document.getElementById('discard_game_id').style.display = 'none';}, 8000);
+                setTimeout(() => {disactiv_section('discard_game_id')}, 8000);
+            }
+            else if (data.type == 'game.countdown')
+            {
+                var countdown = data.time;
+                const interval = setInterval(() => {
+                    ctx.clearRect(0, 0, width, height);
+                    put_score(countdown, width / 2, height / 2);
+                    if (countdown == 1)
+                        clearInterval(interval);
+                    countdown -= 1;
+                }, 1000);
             }
             else if (data.type == 'game.info')
                 display_ping_pong(data);
@@ -394,14 +404,6 @@ async function run(section_id, socket_url, canvas_id, type)
                         four_game_starting = true;
                     game_asid(false);
                     // active_section(section_id);
-                    var countdown = 3;
-                    const interval = setInterval(() => {
-                        ctx.clearRect(0, 0, width, height);
-                        put_score(countdown, width / 2, height / 2);
-                        if (countdown == 1)
-                            clearInterval(interval);
-                        countdown -= 1;
-                    }, 1000);
                     document.addEventListener("keydown", (event) => {
                         if (game_socket.readyState === WebSocket.OPEN)
                         {
@@ -411,7 +413,7 @@ async function run(section_id, socket_url, canvas_id, type)
                                 game_socket.send(JSON.stringify({'type':'move', 'move':'Down'}));
                         }
                     });
-                    
+
                     document.addEventListener("keyup", (event) => {
                         if (game_socket.readyState === WebSocket.OPEN)
                         {
@@ -506,7 +508,10 @@ function navigate(section_id) {
     else if (section_id == 'ping-pong-4')
     {
         active_section('loading-section-id');
+        document.getElementById("game_aside_id").style.display = 'block';
         document.getElementById("tournament_aside_id").style.display = 'none';
+        document.getElementById('Home-aside').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+        document.getElementById('game-aside').style.cssText = 'font-size: 40px; color: #ff44e4; ';
         run('play-4', '/wss/four_players/', '4-canvas-id', {'type':'random', 'vs':'undefined'});
     }
     else if (section_id == 'tournament_input')
@@ -560,6 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('messages').style.color = 'red';
             });
         });
+        remove_all_event_listener('toggle-btn');
         document.getElementById('toggle-btn').addEventListener('click', toggleFullScreen);
         document.addEventListener('fullscreenchange', (event) => {
             if (document.fullscreenElement) {
@@ -583,7 +589,7 @@ function    tst(section_id)
     document.querySelector('.conteudo').style.display = 'none';
     document.getElementById('tournament_nav_list_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('tournament_nav_making_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
-    document.getElementById('tournament_nav_NMatch_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    // document.getElementById('tournament_nav_NMatch_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById(section_id).style.display = 'flex';
     if (section_id == 'tournament_list')
     {
@@ -912,6 +918,7 @@ function    close_AI()
         close_local_game();
     if (four_game_starting)
         close_game();
+    document.getElementById('waiting_id').innerHTML = '';
 }
 
 function show_local_game_Result(idx){
@@ -1116,8 +1123,7 @@ function    fill_Match(round, idx, obj)
         // display_name.textContent = i;
         container.appendChild(icon);
         container.appendChild(display_name);
-        document.getElementsByClassName('tournament_nav').appendChild(container);
-        // <a class="icons" onclick="tst('tournament_next_match_id')"><i id="tournament_nav_NMatch_item_id" class="fa-solid fa-ranking-star"></i></a>
+        // document.getElementsByClassName('tournament_nav').appendChild(container);
     }
 }
 
@@ -1173,7 +1179,7 @@ function    start_match()
     
     // document.getElementById('give_up_from_game_id').style.display = 'none';
     start_local_game();
-    // document.getElementById('tournament_nav_NMatch_item_id').style.display = 'none';
+    document.getElementById('tournament_nav_NMatch_item_id').style.display = 'none';
 }
 
 var TOURNAMENT_LIST = [];

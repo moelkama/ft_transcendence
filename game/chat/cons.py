@@ -128,15 +128,12 @@ class   Match:
 
     async def run_game(self):
         await send_to_group(self.players, {'data':json.dumps(self, default=serialize_Match)})
+        for channel in self.players:
+            await channel.send(json.dumps({'type':'game.countdown', 'time':3}))
         await asyncio.sleep(4)
         while self.players[0].avaible and self.players[1].avaible:
             self.move()
             await send_to_group(self.players, {'data':json.dumps(self, default=serialize_Match)})
-            # await self.players[0].channel_layer.group_send(self.players[0].group_name,
-            # {
-            #     'type': 'send_data',
-            #     'data':json.dumps(self, default=serialize_Match)
-            # })
             if (self.team1_score == score_to_win):
                 return 1
             if (self.team2_score == score_to_win):
@@ -263,13 +260,13 @@ class RacetCunsumer(AsyncWebsocketConsumer):
             self.group_name = connects[room_creater].room_name
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         self.i = 1
-        for room in rooms.values():
-            if room.players[0] and room.players[0].user.username == self.user.username:
-                await room.players[0].send(json.dumps({'type':'discard', 'game_type':'four_players_game'}))
-                room.players[0] = self
-            if (self.user.username in waiting):
-                await waiting[self.user.username].send(json.dumps({'type':'discard', 'game_type':'four_players_game'}))
-                del waiting[self.user.username]
+        # for room in rooms.values():
+        #     if room.players[0] and room.players[0].user.username == self.user.username:
+        #         await room.players[0].send(json.dumps({'type':'discard', 'game_type':'four_players_game'}))
+        #         room.players[0] = self
+        #     if (self.user.username in waiting):
+        #         await waiting[self.user.username].send(json.dumps({'type':'discard', 'game_type':'four_players_game'}))
+        #         del waiting[self.user.username]
         if self.group_name in rooms:
             if rooms[self.group_name].players[0].user.username != self.user.username:
                 self.racket = racket(width - ww, (height - hh) / 2, 0, height)
@@ -278,7 +275,7 @@ class RacetCunsumer(AsyncWebsocketConsumer):
                 await send_to_group(rooms[self.group_name].players, {'data':json.dumps(rooms[self.group_name], default=serialize_Users)})
                 group_name = 'Match_' + datetime.now().time().strftime("%H_%M_%S_%f")
             # else:
-            #     await self.close()
+            #     await rooms.players[0].send(json.dumps({'type':'discard', 'game_type':'four_players_game'}))
         else:
             self.racket = racket(0, (height - hh) / 2, 0, height)
             rooms[self.group_name] = Match(2)

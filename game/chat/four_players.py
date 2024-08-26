@@ -112,7 +112,7 @@ class   four_players(AsyncWebsocketConsumer):
         token = f.decrypt(add_padding(token).encode()).decode()
         data = endpoint(token, id)
         self.user = User(data)
-        if (self.user.username in waiting):
+        if self.user.username in waiting:
             await waiting[self.user.username].send(json.dumps({'type':'discard', 'game_type':'four_players_game'}))
             del waiting[self.user.username]
             # await waiting[self.user.username].close()

@@ -502,13 +502,6 @@ section.active {
     text-align: center;
 }
 
-#refuse_game_id{
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-}
 .pp{
     padding: 10px;
     background-color: #1d1e21;
