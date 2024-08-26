@@ -1,18 +1,18 @@
 var url;
 
-var game_socket = null;
-var main_socket = null;
-var elem = null;
-var ctx = null;
-var width = null;
-var height = null;
+var game_socket;
+var main_socket;
+var elem;
+var ctx;
+var width;
+var height;
 //////////////
 var hh = 80
 var ww = 5
 var racket_speed = 2
 var score_to_win = 1
 var local_game_starting = false;
-var local_game_Interval = null;
+var local_game_Interval;
 var local_game_Interval_starting = false;
 var local_tournament_starting = false;
 var four_game_starting = false;
@@ -105,7 +105,6 @@ async function get_url(socket_url) {
                 document.getElementById('game_refuse_icon_id').src = '/'  + data.vs.icon;
                 document.getElementById('game_refuse_username_id').innerHTML = data.vs.login;
                 border_home();
-                console.log('game.refuse++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
                 put_section('refuse_game_id');
                 setTimeout(() => {disactiv_section('refuse_game_id')}, 2500);
             }
@@ -113,6 +112,7 @@ async function get_url(socket_url) {
 
         main_socket.onerror = function(event) {
             console.error("WebSocket error observed");
+            location.reload();
         };
 
         main_socket.onclose = function(event) {
@@ -131,7 +131,8 @@ function challenge_lastone()
 function challenge_friend(username)
 {
     main_socket.send(JSON.stringify({'type':'room.create', 'vs':username}));
-    active_section('loading-section-id');
+    close_AI();
+    game_asid();
     run('play', '/wss/game/', '2-canvas-id', {'type':'room', 'room_creater':document.getElementById('login').textContent});
 }
 
@@ -199,7 +200,6 @@ function    local_or_remote_game(type)
 function    flex_section(section_id)
 {
     disactiv_sections();
-    document.getElementById('local_or_remote').style.display = 'none';
     document.getElementById(section_id).style.display = 'flex';
 }
 
@@ -269,6 +269,7 @@ function Continue_game(action)
 function    accept_game()
 {
     document.getElementById('game_notification_id').style.display = 'none';
+    close_AI();
     run('play', '/wss/game/', '2-canvas-id', {'type':'room', 'room_creater':document.getElementById('game_notification_username_id').innerHTML});
 }
 
@@ -290,11 +291,6 @@ function    clean_rounds()
     }
 }
 
-// function closeModal(id) {
-//     disactiv_sections();
-//     document.getElementById("home").style.display = 'flex';
-// }
-
 var round = 0;
 function    tournament_info(players, section_id)
 {
@@ -307,9 +303,7 @@ function    tournament_info(players, section_id)
         icon.src = '/' + players[i].icon;
 
         var display_name = document.createElement("h2");
-        // display_name.id = "user-display-name"
         display_name.textContent = players[i].login;
-        // display_name.textContent = i;
         container.appendChild(icon);
         container.appendChild(display_name);
     }
@@ -321,6 +315,7 @@ function    tournament_list(data)
     document.getElementById('tournament_input').style.display = 'none';
     parent = document.getElementById('tournament_content');
     parent.innerHTML = '';
+    document.getElementById('tournament_wait_id').innerHTML = 'waiting for ' + (8 - data.players.length).toString() + ' others...';
     data.players.forEach((element) =>{
         var div = document.createElement("div");
         div.className = "student";
@@ -355,7 +350,6 @@ async function run(section_id, socket_url, canvas_id, type)
         URL = await get_url(socket_url) + '&type=' + type.type + '&room_creater=' + type.room_creater
         game_socket = new WebSocket(URL);
 
-        console.log('canvas_id:::::', canvas_id);
         game_socket.onopen = function(event) {
             console.log("game WebSocket connection established.");
         };
@@ -370,7 +364,6 @@ async function run(section_id, socket_url, canvas_id, type)
             {
                 border_home();
                 put_section('discard_game_id');
-                // document.getElementById('game-asid').style.display = 'none';
                 setTimeout(() => {disactiv_section('discard_game_id')}, 8000);
             }
             else if (data.type == 'game.countdown')
@@ -403,7 +396,6 @@ async function run(section_id, socket_url, canvas_id, type)
                     else if (data.players.length == 4)
                         four_game_starting = true;
                     game_asid(false);
-                    // active_section(section_id);
                     document.addEventListener("keydown", (event) => {
                         if (game_socket.readyState === WebSocket.OPEN)
                         {
@@ -477,6 +469,8 @@ function new_game(){
 function    close_tournament()
 {
     close_game();
+    if (tournament_starting)
+        game_socket.close(1000, 'Normal Closure');
     document.getElementById("tournament_aside_id").style.display = 'none';
     tournament_starting = false;
 }
@@ -589,7 +583,7 @@ function    tst(section_id)
     document.querySelector('.conteudo').style.display = 'none';
     document.getElementById('tournament_nav_list_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById('tournament_nav_making_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
-    // document.getElementById('tournament_nav_NMatch_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
+    document.getElementById('tournament_nav_NMatch_item_id').style.cssText = 'font-size: 36px; color: ##ffffffbc; ';
     document.getElementById(section_id).style.display = 'flex';
     if (section_id == 'tournament_list')
     {
@@ -884,7 +878,6 @@ function    close_local_game()
     document.getElementById("game_aside_id").style.display = 'none';
     if (local_game_starting)
     {
-        console.log('close_local_game called', border_home);
         ctx.clearRect(0, 0, width, height);
         delete match;
         local_game_starting = false;

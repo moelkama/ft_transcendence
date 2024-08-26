@@ -1,1 +1,1 @@
-local_tournament_starting
+ = null
