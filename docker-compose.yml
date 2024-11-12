@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   authdb:
@@ -6,8 +6,8 @@ services:
     container_name: authdb
     volumes:
       - ./auth/data/db:/var/lib/postgresql/data
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     restart: always
 
   gamedb:
@@ -15,8 +15,8 @@ services:
     container_name: gamedb
     volumes:
       - ./game/data/db:/var/lib/postgresql/data
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     depends_on:
       - authdb
     restart: always
@@ -26,8 +26,8 @@ services:
     container_name: trackdb
     volumes:
       - ./track/data/db:/var/lib/postgresql/data
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     depends_on:
       - gamedb
     restart: always
@@ -37,8 +37,8 @@ services:
     container_name: chatdb
     volumes:
       - ./chat/data/db:/var/lib/postgresql/data
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     depends_on:
       - authdb
     restart: always
@@ -49,8 +49,8 @@ services:
     container_name: auth
     volumes:
       - ./auth/.:/code
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     depends_on:
       - authdb
     restart: always
@@ -61,8 +61,8 @@ services:
     container_name: game
     volumes:
       - ./game/.:/code
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     depends_on:
       - gamedb
     restart: always
@@ -73,8 +73,8 @@ services:
     container_name: track
     volumes:
       - ./track/.:/code
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     depends_on:
       - gamedb
     restart: always
@@ -85,8 +85,8 @@ services:
     container_name: chat
     volumes:
       - ./chat/.:/code
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     depends_on:
       - chatdb
     restart: always
